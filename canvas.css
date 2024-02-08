@@ -1,0 +1,10 @@
+canvas{
+  widht: 80%;
+  height: 80%;
+  border: 5px solid black;
+}
+body{
+  dispaly: flex;
+  justify-content: center;
+  aign-items: center;
+}
