@@ -6,7 +6,7 @@ const greeting = document.querySelector("#greeting");
 const HIDDEN_CLASSNAME = "hidden";
 const USERNAME_KEY = "username";
 const savedUsername = localStorage.getItem(USERNAME_KEY);
-console.log(savedUsername);
+
 if (savedUsername === null){
   loginForm.classList.remove(HIDDEN_CLASSNAME);
   loginForm.addEventListener("submit", onLoginSubmit);
@@ -24,9 +24,9 @@ function onLoginSubmit(event){
 function onLoginBtnClick(){
   const username = loginInput.value;
   if(username === ""){
-    alert("Please write your name");
+    //alert("Please write your name");
   }else if(username.length > 15){
-    alert("Your name is too long");
+    //alert("Your name is too long");
   }else{
     alert("Hello " + username);
     loginForm.classList.add(HIDDEN_CLASSNAME);
