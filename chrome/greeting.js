@@ -42,7 +42,7 @@ function paintGreetings(username){
   greeting.classList.remove(HIDDEN_CLASSNAME);//greeting에 hidden을 제거
 }
 
-link.addEventListener("click",handleLinkClick);//link에 click 이벤트를 추가
+/*link.addEventListener("click",handleLinkClick);//link에 click 이벤트를 추가
 function handleLinkClick(event){
   event.preventDefault();//이벤트가 발생했을때 기본동작을 막아줌
-}
+}*/
