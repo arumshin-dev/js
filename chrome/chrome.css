@@ -120,3 +120,12 @@ input[type="text"]:focus {
 #todo-list li.checked span {
   text-decoration: line-through;
 }
+
+#quote span:first-child {
+  font-style: italic;
+  font-size: 24px;
+}
+
+#quote span:nth-child(2) {
+  font-weight: bold;
+}
