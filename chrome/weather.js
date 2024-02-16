@@ -1,5 +1,6 @@
-const weather = document.querySelector("#weather span:first-child");
-const city = document.querySelector("#weather span:last-child");
+const weather = document.querySelector("#weather p:first-child");
+const temp = document.querySelector("#weather p:nth-child(2)");
+const city = document.querySelector("#weather p:last-child");
 const API_KEY = "0ea448976872c92efc348b7a334be436";
 
 function onGeoOk(position) {
@@ -12,8 +13,13 @@ function onGeoOk(position) {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
+      weather.innerText = `${data.weather[0].main}`;
+      temp.innerText = `${data.main.temp}º`;
       city.innerText = data.name;
-      weather.innerText = `${data.weather[0].main} / ${data.main.temp}`;
+      let currIcon = new Image();
+      currIcon.src=`http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+      currIcon.alt='날씨아이콘';
+      document.querySelector("#weather").appendChild(currIcon);
     });
 }
 function onGeoError() {

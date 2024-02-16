@@ -30,7 +30,7 @@ function onLoginBtnClick(){
   }else{
     alert("Hello " + username);
     loginForm.classList.add(HIDDEN_CLASSNAME);//loginForm에 hidden을 추가
-    paintGreetings(savedUsername);//savedUsername을 받아서 paintGreetings 함수 실행
+    paintGreetings(username);//username 받아서 paintGreetings 함수 실행
     //localStorage는 사용자가 브라우저를 종료하고 다시 시작할때에도 저장된 값을 가져올 수 있음
     localStorage.setItem("username",username);//local storage에 username을 저장
     

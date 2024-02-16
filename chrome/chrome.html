@@ -9,13 +9,25 @@
 </head>
 
 <body>
-  chrome
+  <div class="container">
+    <img class="background-image" src="" alt="Background Image"><!--배경이미지 깔리게-->
+    <div class="top-bar">
+  <div id="weather">
+    <div>
+    <p></p>
+    <p></p>
+    <p></p>
+    </div>
+  </div>
+    </div>
+    <div class="content">
+      <h1>Welcome to arum Momentum</h1>
+      <h2 id="clock">00:00:00</h2>
   <form id="login-form" class="hidden">
     <input required maxlength="15" type="text" placeholder="what is your name?"/>
     <!--<input type="password" placeholder="password"/>-->
     <input type="submit" value="Log In"/>
   </form>
-  <h2 id="clock">00:00:00</h2>
   <h1 id="greeting" class="hidden"></h1>
   <form id="todo-form">
     <input type="text" placeholder="Write a To Do and Press Enter" required/>
@@ -25,11 +37,9 @@
     <span></span>
     <span></span>
   </div>
-  <div id="weather">
-    <span></span>
-    <span></span>
-  </div>
   <!--<a href="https://www.google.com" target="_blank">go to google</a>-->
+    </div>
+  </div>
   <script src="/chrome/greeting.js"></script>
   <script src="/chrome/clock.js"></script>
   <script src="/chrome/quotes.js"></script>

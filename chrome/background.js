@@ -2,8 +2,9 @@ const images = ["https://raw.githubusercontent.com/nomadcoders/javascript-for-be
 
 const chosenImage = images[Math.floor(Math.random() * images.length)];
 
-const bgImage = document.createElement("img");
+//const bgImage = document.createElement("img");
+const bgImage = document.querySelector(".background-image");
 
 bgImage.src = `${chosenImage}`;
 
-document.body.appendChild(bgImage);
+//document.body.appendChild(bgImage);
