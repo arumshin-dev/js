@@ -110,3 +110,13 @@ input[type="text"]:focus {
 #todo-list button:hover {
   background-color: #d32f2f60; /* 호버 시 배경색 변경 */
 }
+
+/* 체크박스 스타일링 */
+#todo-list input[type="checkbox"] {
+  margin-right: 10px; /* 체크박스와 텍스트 사이에 간격 추가 */
+}
+
+/* 체크된 아이템의 텍스트에 줄 긋기 */
+#todo-list li.checked span {
+  text-decoration: line-through;
+}
