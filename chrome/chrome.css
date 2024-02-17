@@ -129,3 +129,11 @@ input[type="text"]:focus {
 #quote span:nth-child(2) {
   font-weight: bold;
 }
+#quote .context {
+  font-style: italic;
+  font-size: 20px;
+}
+
+#quote .author {
+  font-weight: bold;
+}
