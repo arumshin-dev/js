@@ -68,8 +68,8 @@ fetch('https://api.quotable.io/random')//랜덤 한개
       console.log('랜덤 Inspirational 명언:', data.content);
       console.log('저자:', data.author);
       quote.innerText = `"${data.content}"`;
-      author.innerText = `-${data.author}`;
-      translateToKorean(data.content);//번역
+      author.innerText = `- ${data.author}`;
+      translateToKorean(`"${data.content}"- ${data.author}`);//번역
     } else {
       console.log('명언이 없습니다.');
     }
