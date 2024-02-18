@@ -60,4 +60,26 @@ ctx.arc(160,470,10,0,1*Math.PI);//;
 ctx.fill();
 
 ctx.beginPath();
-ctx.tri
+ctx.beginPath();
+ctx.arc(75+200, 75, 50, 0, Math.PI * 2, true); // Outer circle
+ctx.moveTo(110+200, 75);
+ctx.arc(75+200, 75, 35, 0, Math.PI, false); // Mouth (clockwise)
+ctx.moveTo(65+200, 65);
+ctx.arc(60+200, 65, 5, 0, Math.PI * 2, true); // Left eye
+ctx.moveTo(95+200, 65);
+ctx.arc(90+200, 65, 5, 0, Math.PI * 2, true); // Right eye
+ctx.stroke();
+
+// Cubic curves example
+ctx.beginPath();
+ctx.fillStyle="hotpink"
+var x = 310;
+var y = 0;
+ctx.moveTo(75+x, 40+y);
+ctx.bezierCurveTo(75+x, 37+y, 70+x, 25+y, 50+x, 25+y);
+ctx.bezierCurveTo(20+x, 25+y, 20+x, 62.5+y, 20+x, 62.5+y);
+ctx.bezierCurveTo(20+x, 80+y, 40+x, 102+y, 75+x, 120+y);
+ctx.bezierCurveTo(110+x, 102+y, 130+x, 80+y, 130+x, 62.5+y);
+ctx.bezierCurveTo(130+x, 62.5+y, 130+x, 25+y, 100+x, 25+y);
+ctx.bezierCurveTo(85+x, 25+y, 75+x, 37+y, 75+x, 40+y);
+ctx.fill();
