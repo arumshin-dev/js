@@ -1,13 +1,14 @@
+const lineWidth = document.getElementById("line-width");
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 800;
 
-ctx.lineWidth = 2;
+ctx.lineWidth = lineWidth.value;
 isPainting = false;
 
-function onMove(event){
-  if(isPainting){
+function onMove(event) {
+  if (isPainting) {
     ctx.lineTo(event.offsetX, event.offsetY);
     ctx.stroke();
     return;
@@ -15,15 +16,22 @@ function onMove(event){
   ctx.moveTo(event.offsetX, event.offsetY);
 }
 
-function onMouseDown(){
+function startPainting() {
   isPainting = true;
 }
 
-function onMouseUp(){
+function cancelPainting() {
   isPainting = false;
+  ctx.beginPath();//기존 선과 연결 끊어주기
+}
+
+function onLineWidthChange(event) {
+  console.log(event.target.value);
+  ctx.lineWidth = event.target.value;
 }
 
 //canvas.addEventListener("click", onClick);
 canvas.addEventListener("mousemove", onMove);
-canvas.addEventListener("mousedown", onMouseDown);
-canvas.addEventListener("mouseup", onMouseUp)
+canvas.addEventListener("mousedown", startPainting);
+canvas.addEventListener("mouseup", cancelPainting);
+lineWidth.addEventListener("change", onLineWidthChange)
