@@ -1,6 +1,6 @@
 const colorOptions = Array.from(
   document.getElementsByClassName("color-option")
-);
+);//forEach 쓰기 위해서 collection을 array로 바꿔줌
 const color = document.getElementById("color");
 const lineWidth = document.getElementById("line-width");
 const canvas = document.querySelector('canvas');
@@ -45,9 +45,9 @@ function onColorClick(event) {
   color.value = colorValue;
 }
 
-canvas.addEventListener("mousemove", onMove);
-canvas.addEventListener("mousedown", startPainting);
-canvas.addEventListener("mouseup", cancelPainting);
-lineWidth.addEventListener("change", onLineWidthChange);
-color.addEventListener("change", onColorChange);
-colorOptions.forEach((color) => color.addEventListener("click", onColorClick));
+canvas.addEventListener("mousemove", onMove);//마우스 움직임
+canvas.addEventListener("mousedown", startPainting);//마우스 클릭 눌렀을때
+canvas.addEventListener("mouseup", cancelPainting);//마우스 클릭떼면
+lineWidth.addEventListener("change", onLineWidthChange);//라인 굵기 변경
+color.addEventListener("change", onColorChange);//색 input에서 다른 색 바꿔서 선택하면
+colorOptions.forEach((color) => color.addEventListener("click", onColorClick));//컬러 옵션 팔레트 클릭하면
