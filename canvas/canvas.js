@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 800;
 
 ctx.lineWidth = lineWidth.value;
-isPainting = false;
+let isPainting = false;
 
 function onMove(event) {
   if (isPainting) {
@@ -26,12 +26,10 @@ function cancelPainting() {
 }
 
 function onLineWidthChange(event) {
-  console.log(event.target.value);
   ctx.lineWidth = event.target.value;
 }
 
-//canvas.addEventListener("click", onClick);
 canvas.addEventListener("mousemove", onMove);
 canvas.addEventListener("mousedown", startPainting);
 canvas.addEventListener("mouseup", cancelPainting);
-lineWidth.addEventListener("change", onLineWidthChange)
+lineWidth.addEventListener("change", onLineWidthChange);
