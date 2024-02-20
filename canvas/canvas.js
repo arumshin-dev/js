@@ -39,7 +39,7 @@ function onColorChange(event) {
 }
 
 function onColorClick(event) {
-  const colorValue = event.target.dataset.color;
+  const colorValue = event.target.dataset.color;//js 에서 쓰기 위해서 data-color를 사용
   ctx.strokeStyle = colorValue;
   ctx.fillStyle = colorValue;
   color.value = colorValue;
