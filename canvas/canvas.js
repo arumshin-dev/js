@@ -3,6 +3,7 @@ const destroyBtn = document.getElementById("destroy-btn");
 const eraserBtn = document.getElementById("eraser-btn");
 const fileInput = document.getElementById("file");
 const textInput = document.getElementById("text");
+const saveBtn = document.getElementById("save");
 const colorOptions = Array.from(
   document.getElementsByClassName("color-option")
 );//forEach 쓰기 위해서 collection을 array로 바꿔줌
@@ -101,8 +102,16 @@ function onDoubleClick(event){
     ctx.lineWidth = 1;
     ctx.font = "68px serif";
     ctx.fillText(text, event.offsetX, event.offsetY);
-    ctx.restore();
+    ctx.restore();//저장된 상태로 되돌리
   }
+}
+
+function onSaveClick() {
+  const url = canvas.toDataURL();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "myDrawing.png";
+  a.click();
 }
 
 canvas.addEventListener("dblclick", onDoubleClick);
@@ -118,3 +127,4 @@ modeBtn.addEventListener("click", onModeClick);
 destroyBtn.addEventListener("click", onDestroyClick);
 eraserBtn.addEventListener("click", onEraserClick);
 fileInput.addEventListener("change", onFileChange);
+saveBtn.addEventListener("click", onSaveClick);
