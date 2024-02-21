@@ -2,6 +2,7 @@ const modeBtn = document.getElementById("mode-btn");
 const destroyBtn = document.getElementById("destroy-btn");
 const eraserBtn = document.getElementById("eraser-btn");
 const fileInput = document.getElementById("file");
+const textInput = document.getElementById("text");
 const colorOptions = Array.from(
   document.getElementsByClassName("color-option")
 );//forEach 쓰기 위해서 collection을 array로 바꿔줌
@@ -15,6 +16,7 @@ const CANVAS_HEIGHT = 800;
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 ctx.lineWidth = lineWidth.value;
+ctx.lineCap = "round";//선 끝 둥글
 let isPainting = false;
 let isFilling = false;
 
@@ -92,6 +94,18 @@ function onFileChange(event) {
   };
 }
 
+function onDoubleClick(event){
+  const text = textInput.value;
+  if (text !== "") {
+    ctx.save();//캔버스 기존 상태(색상,선굵기 등) 세팅 저장
+    ctx.lineWidth = 1;
+    ctx.font = "68px serif";
+    ctx.fillText(text, event.offsetX, event.offsetY);
+    ctx.restore();
+  }
+}
+
+canvas.addEventListener("dblclick", onDoubleClick);
 canvas.addEventListener("mousemove", onMove);//마우스 움직임
 canvas.addEventListener("mousedown", startPainting);//마우스 클릭 눌렀을때
 canvas.addEventListener("mouseup", cancelPainting);//마우스 클릭떼면
