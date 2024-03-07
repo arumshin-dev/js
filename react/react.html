@@ -13,25 +13,20 @@
   <script type="text/babel">
     //리액트에서 생성한 컴포넌트를 렌더링할 div를 정의
     const root = document.getElementById("root");
-    //JSX 방식으로 h3태그 새로 작성(JSX는 HTML과 같은 표현식을 JS로 변환)
+    //JSX 방식으로 h3태그 새로 작성(JSX는 HTML과 같은 표현식을 JS로 변환), JSX 방식으로 태그안에 Title을 넣기 위해 애로우 함수로 변경(일반적인 함수 방식으로 할 경우 funtion 함수명() {return(<h3></h3>)} 와 같은 형식으로 작성해야함)
     const Title = () => (
       <h3 id="title" onMouseEnter={() => console.log("mouse enter")}>
         Hello I`m a Title
       </h3>
     );
-    //JSX 방식으로 button태그 새로 작성(JSX는 HTML과 같은 표현식을 JS로 변환, style 속성에만 중괄호를 두개 중첩하여 사용)
+    //JSX 방식으로 button태그 새로 작성(JSX는 HTML과 같은 표현식을 JS로 변환, style 속성에만 중괄호를 두개 중첩하여 사용), JSX 방식으로 태그안에 Title을 넣기 위해 애로우 함수로 변경(일반적인 함수 방식으로 할 경우 funtion 함수명() {return(<button></button>)} 와 같은 형식으로 작성해야함)
     const Button = () => (
       <button onClick={() => console.log("i`m clicked")} style={{backgroundColor : "tomato"}}>
         Click me
       </button>
     );
+    //div태그를 생성하고 위의 Title과 Button을 넣는 방식을 JSX 방식으로 변경, <div></div> 사이에 html 태그 형식으로 JSX로 생성한 함수(return이 포함된 함수)를 넣어야하며, 기존 html태그와의 구분을 위해 첫 글자는 대문자로 해야한다.(함수명도 대문자로 생성해야함)
     const Container = <div><Title/> <Button/></div>
-    //위의 생성한 Title과 Button을 담을 div를 생성(ReactDOM에 렌더링할때 렌더링을 한번에 하기 위해 생성)
-    const container = React.createElement(
-      "div", 
-      null, 
-      [Title, Button]
-    );
     //리액트를 통해 container를 렌더링
     ReactDOM.render(Container, root);
   </script>
