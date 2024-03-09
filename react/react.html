@@ -17,11 +17,16 @@
     function App() {
       //useState를 활용하여 변경할 데이터를 생성
       const [minutes, setMinutes] = React.useState(0);
+      const [fliped, setFliped] = React.useState(false);
       const onChange = (event) => {
           setMinutes(event.target.value);
       };
       const reset = () => {
           setMinutes(0);
+      }
+      const onFlip = () => {
+        //setFliped(!fliped);
+        setFliped(current => !current);
       }
       return(
         <div>
@@ -30,13 +35,14 @@
           </h1>
           <div>
           <label htmlFor="minutes">Minutes</label>
-          <input id="minutes" placeholder="Minutes" type="number" value={minutes} onChange={onChange}/>
+          <input id="minutes" placeholder="Minutes" type="number" value={minutes} onChange={onChange} disabled={fliped === true}/>
           </div>
           <div>
           <label htmlFor="hours">Hours</label>
-          <input id="hours" placeholder="Hours" type="number"  value={Math.round(minutes/60)} disabled/>
+          <input id="hours" placeholder="Hours" type="number"  value={Math.round(minutes/60)} disabled={fliped === false}/>
           </div>
           <button onClick={reset}>Reset</button>
+          <button onClick={onFlip}>Flip</button>
         </div>
       );
     }
