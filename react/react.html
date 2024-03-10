@@ -16,17 +16,18 @@
     //div태그 생성 변경될 데이터와 클릭 이벤트 함수를 생성 함수 안에 내포하여 리렌더링 자동으로 되게 적용. React.useState(기본값, 변경 함수)를 활용하여 자동 리렌더링 적용.
     function App() {
       //useState를 활용하여 변경할 데이터를 생성
-      const [minutes, setMinutes] = React.useState(0);
-      const [fliped, setFliped] = React.useState(false);
+      const [amount, setAmount] = React.useState(0);
+      const [flipped, setFlipped] = React.useState(false);
       const onChange = (event) => {
-          setMinutes(event.target.value);
+            setAmount(event.target.value);
       };
       const reset = () => {
-          setMinutes(0);
+            setAmount(0);
       }
       const onFlip = () => {
-        //setFliped(!fliped);
-        setFliped(current => !current);
+        reset();
+        //setFlipped(!fliped);
+        setFlipped(current => !current);
       }
       return(
         <div>
@@ -35,11 +36,11 @@
           </h1>
           <div>
           <label htmlFor="minutes">Minutes</label>
-          <input id="minutes" placeholder="Minutes" type="number" value={minutes} onChange={onChange} disabled={fliped}/>
+          <input id="minutes" placeholder="Minutes" type="number" value={flipped ? amount*60 : amount} onChange={onChange} disabled={flipped}/>
           </div>
           <div>
           <label htmlFor="hours">Hours</label>
-          <input id="hours" placeholder="Hours" type="number"  value={Math.round(minutes/60)} disabled={!fliped}/>
+          <input id="hours" placeholder="Hours" type="number"  value={flipped ? amount : Math.round(amount/60)} disabled={!flipped} onChange={onChange}/>
           </div>
           <button onClick={reset}>Reset</button>
           <button onClick={onFlip}>Flip</button>
