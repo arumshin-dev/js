@@ -15,35 +15,44 @@
     const root = document.getElementById("root");
     //div태그 생성 변경될 데이터와 클릭 이벤트 함수를 생성 함수 안에 내포하여 리렌더링 자동으로 되게 적용. React.useState(기본값, 변경 함수)를 활용하여 자동 리렌더링 적용.
     function App() {
-      //useState를 활용하여 변경할 데이터를 생성
       const [amount, setAmount] = React.useState(0);
-      const [flipped, setFlipped] = React.useState(false);
+      const [inverted, setInverted] = React.useState(false);
       const onChange = (event) => {
-            setAmount(event.target.value);
-      };
-      const reset = () => {
-            setAmount(0);
+        setAmount(event.target.value);
       }
-      const onFlip = () => {
+      const reset = () => {
+        setAmount(0);
+      }
+      const onInvert = () => {
         reset();
-        //setFlipped(!fliped);
-        setFlipped(current => !current);
+        setInverted(current => !current);
       }
       return(
         <div>
-          <h1 className="hi">
-            Super Converter
-          </h1>
+          <h1 className="hi">Super Converter</h1>
           <div>
-          <label htmlFor="minutes">Minutes</label>
-          <input id="minutes" placeholder="Minutes" type="number" value={flipped ? amount*60 : amount} onChange={onChange} disabled={flipped}/>
+            <label htmlFor="minutes">Minutes</label>
+            <input 
+              id="minutes" 
+              placeholder="Minutes" 
+              type="number" 
+              value={inverted ? amount * 60 : amount } 
+              onChange={onChange}
+              disabled={inverted}
+            />
           </div>
           <div>
-          <label htmlFor="hours">Hours</label>
-          <input id="hours" placeholder="Hours" type="number"  value={flipped ? amount : Math.round(amount/60)} disabled={!flipped} onChange={onChange}/>
+            <label htmlFor="hours">Hours</label>
+            <input 
+              id="hours" 
+              placeholder="Hours" 
+              type="number"
+              value={inverted ? amount : Math.round(amount/60) }
+              onChange={onChange}
+              disabled={!inverted}/>
           </div>
           <button onClick={reset}>Reset</button>
-          <button onClick={onFlip}>Flip</button>
+          <button onClick={onInvert}>{inverted ? "Hour to Min" : "Min to Hour"}</button>
         </div>
       );
     }
