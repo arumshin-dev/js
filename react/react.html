@@ -11,140 +11,17 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <!-- babel을 통해 JSX를 react 언어로 변환하기 위해 script type을 변경 -->
   <script type="text/babel">
-    //div태그 생성 변경될 데이터와 클릭 이벤트 함수를 생성 함수 안에 내포하여 리렌더링 자동으로 되게 적용. React.useState(기본값, 변경 함수)를 활용하여 자동 리렌더링 적용.
-    function MinutesToHours() {
-      //숫자 변수 생성
-      const [amount, setAmount] = React.useState(0);
-      //분,시 변경 변수 생성
-      const [inverted, setInverted] = React.useState(false);
-      //숫자 변수 변경 시 동작 함수 생성
-      const onChange = (event) => {
-        //이벤트에서 input에 value 가져오기
-        setAmount(event.target.value);
-      }
-      //초기화 함수 생성
-      const reset = () => {
-        //숫자 초기값으로 적용
-        setAmount(0);
-      }
-      //분,시 변경 함수 생성
-      const onInvert = () => {
-        //초기화 함수 호출
-        reset();
-        //true, false 변경
-        setInverted(current => !current);
-      }
-      return(
-        <div>
-          <div>
-            <label htmlFor="minutes">Minutes</label>
-            <input id="minutes" placeholder="Minutes" type="number" value={inverted ? amount * 60 : amount } onChange={onChange} disabled={inverted}/>
-          </div>
-          <div>
-            <label htmlFor="hours">Hours</label>
-            <input id="hours" placeholder="Hours" type="number" value={inverted ? amount : Math.round(amount/60) } onChange={onChange} disabled={!inverted}/>
-          </div>
-          <button onClick={reset}>Reset</button>
-          <button onClick={onInvert}>{inverted ? "Hour to Min" : "Min to Hour"}</button>
-        </div>
-      );
-    }
-    function KmToMiles() {
-      //숫자 변수 생성
-      const [amount, setAmount] = React.useState(0);
-      // 변경 변수 생성
-      const [inverted, setInverted] = React.useState(false);
-      //숫자 변수 변경 시 동작 함수 생성
-      const onChange = (event) => {
-        //이벤트에서 input에 value 가져오기
-        setAmount(event.target.value);
-      }
-      //초기화 함수 생성
-      const reset = () => {
-        //숫자 초기값으로 적용
-        setAmount(0);
-      }
-      // 변경 함수 생성
-      const onInvert = () => {
-        //초기화 함수 호출
-        reset();
-        //true, false 변경
-        setInverted(current => !current);
-      }
-      return(
-        <div>
-          <div>
-            <label htmlFor="kilometers">Kilometers</label>
-            <input id="kilometers" placeholder="Kilometers" type="number" value={inverted ? amount*1.609344 : amount } onChange={onChange} disabled={inverted}/>
-          </div>
-          <div>
-            <label htmlFor="miles">Miles</label>
-            <input id="miles" placeholder="Miles" type="number" value={inverted ? amount : amount*0.621371 } onChange={onChange} disabled={!inverted}/>
-          </div>
-          <button onClick={reset}>Reset</button>
-          <button onClick={onInvert}>{inverted ? "Km to Miles" : "Miles to Km"}</button>
-        </div>
-      );
-    }
-    function Converter(prop) {
-      console.log(prop);
-      let x = prop.x;
-      let y = prop.y;
-      let calc = parseFloat(prop.calc);
-      //숫자 변수 생성
-      const [amount, setAmount] = React.useState(0);
-      // 변경 변수 생성
-      const [inverted, setInverted] = React.useState(false);
-      //숫자 변수 변경 시 동작 함수 생성
-      const onChange = (event) => {
-        //이벤트에서 input에 value 가져오기
-        setAmount(event.target.value);
-      }
-      //초기화 함수 생성
-      const reset = () => {
-        //숫자 초기값으로 적용
-        setAmount(0);
-      }
-      // 변경 함수 생성
-      const onInvert = () => {
-        //초기화 함수 호출
-        reset();
-        //true, false 변경
-        setInverted(current => !current);
-      }
-      return(
-        <div>
-          <div>
-            <label htmlFor="a">{x}</label>
-            <input id="a" placeholder={x} type="number" value={inverted ? amount*calc : amount } onChange={onChange} disabled={inverted}/>
-          </div>
-          <div>
-            <label htmlFor="b">{y}</label>
-            <input id="b" placeholder={y} type="number" value={inverted ? amount : amount/calc } onChange={onChange} disabled={!inverted}/>
-          </div>
-          <button onClick={reset}>Reset</button>
-          <button onClick={onInvert}>{inverted ? x+" to "+y : y+" to "+x}</button>
-        </div>
-      );
+    function Btn(props){
+      console.log(props)
+      return <button style={{backgroundColor:"pink",color:"white",padding:"10px 20px",border:0,borderRadius:10,fontSize:props.big?20:10}}>{props.text}</button>
     }
     function App(){
-      const [index, setIndex] = React.useState("xx");
-      const onSelect = (event) => {
-        setIndex(event.target.value);
-      }
-      console.log("render w/ ",index);
+      
       return(
         <div>
-          <h1 className="hi">Super Converter</h1>
-          <select value={index} onChange={onSelect}>
-            <option value="xx">Select your units</option>
-            <option value="0">Minutes & Hours</option>
-            <option value="1">Km & Miles</option>
-            <option value="2">mb & gb</option>
-            <option value="3">pound & kg</option>
-          </select>
-          <hr/>
-          {index ==="xx" ? "Please select your units" : index === "0" ? <MinutesToHours /> : index === "1" ? <KmToMiles /> : index==="2" ? <Converter x="mb" y="gb" calc="1024"/> : index==="3" ? <Converter y="kg" x="pound" calc="2.20462"/> : null}
+          {Btn({text:"hi"})}
+          <Btn text="Save Changes" big={true}/>
+          <Btn text="Continue" big={false}/>
         </div>
       );
     }
