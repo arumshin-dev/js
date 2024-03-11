@@ -38,24 +38,11 @@
         <div>
           <div>
             <label htmlFor="minutes">Minutes</label>
-            <input 
-              id="minutes" 
-              placeholder="Minutes" 
-              type="number" 
-              value={inverted ? amount * 60 : amount } 
-              onChange={onChange}
-              disabled={inverted}
-            />
+            <input id="minutes" placeholder="Minutes" type="number" value={inverted ? amount * 60 : amount } onChange={onChange} disabled={inverted}/>
           </div>
           <div>
             <label htmlFor="hours">Hours</label>
-            <input 
-              id="hours" 
-              placeholder="Hours" 
-              type="number"
-              value={inverted ? amount : Math.round(amount/60) }
-              onChange={onChange}
-              disabled={!inverted}/>
+            <input id="hours" placeholder="Hours" type="number" value={inverted ? amount : Math.round(amount/60) } onChange={onChange} disabled={!inverted}/>
           </div>
           <button onClick={reset}>Reset</button>
           <button onClick={onInvert}>{inverted ? "Hour to Min" : "Min to Hour"}</button>
@@ -63,7 +50,41 @@
       );
     }
     function KmToMiles(params) {
-      return <h3>KM 2 M</h3>;
+      //숫자 변수 생성
+      const [amount, setAmount] = React.useState(0);
+      // 변경 변수 생성
+      const [inverted, setInverted] = React.useState(false);
+      //숫자 변수 변경 시 동작 함수 생성
+      const onChange = (event) => {
+        //이벤트에서 input에 value 가져오기
+        setAmount(event.target.value);
+      }
+      //초기화 함수 생성
+      const reset = () => {
+        //숫자 초기값으로 적용
+        setAmount(0);
+      }
+      // 변경 함수 생성
+      const onInvert = () => {
+        //초기화 함수 호출
+        reset();
+        //true, false 변경
+        setInverted(current => !current);
+      }
+      return(
+        <div>
+          <div>
+            <label htmlFor="kilometers">Kilometers</label>
+            <input id="kilometers" placeholder="Kilometers" type="number" value={inverted ? amount*1.609344 : amount } onChange={onChange} disabled={inverted}/>
+          </div>
+          <div>
+            <label htmlFor="miles">Miles</label>
+            <input id="miles" placeholder="Miles" type="number" value={inverted ? amount : amount*0.621371 } onChange={onChange} disabled={!inverted}/>
+          </div>
+          <button onClick={reset}>Reset</button>
+          <button onClick={onInvert}>{inverted ? "Km to Miles" : "Miles to Km"}</button>
+        </div>
+      );
     }
     function App(){
       const [index, setIndex] = React.useState("xx");
