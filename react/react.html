@@ -86,11 +86,11 @@
         </div>
       );
     }
-    function Test(prop) {
+    function Converter(prop) {
       console.log(prop);
-      let A = prop.A;
-      let B = prop.B;
-      let C = parseInt(prop.C);
+      let x = prop.x;
+      let y = prop.y;
+      let calc = parseFloat(prop.calc);
       //숫자 변수 생성
       const [amount, setAmount] = React.useState(0);
       // 변경 변수 생성
@@ -115,15 +115,15 @@
       return(
         <div>
           <div>
-            <label htmlFor="a">{A}</label>
-            <input id="a" placeholder={A} type="number" value={inverted ? amount*C : amount } onChange={onChange} disabled={inverted}/>
+            <label htmlFor="a">{x}</label>
+            <input id="a" placeholder={x} type="number" value={inverted ? amount*calc : amount } onChange={onChange} disabled={inverted}/>
           </div>
           <div>
-            <label htmlFor="b">{B}</label>
-            <input id="b" placeholder={B} type="number" value={inverted ? amount : amount/C } onChange={onChange} disabled={!inverted}/>
+            <label htmlFor="b">{y}</label>
+            <input id="b" placeholder={y} type="number" value={inverted ? amount : amount/calc } onChange={onChange} disabled={!inverted}/>
           </div>
           <button onClick={reset}>Reset</button>
-          <button onClick={onInvert}>{inverted ? A+" to "+B : B+" to "+A}</button>
+          <button onClick={onInvert}>{inverted ? x+" to "+y : y+" to "+x}</button>
         </div>
       );
     }
@@ -141,9 +141,10 @@
             <option value="0">Minutes & Hours</option>
             <option value="1">Km & Miles</option>
             <option value="2">mb & gb</option>
+            <option value="3">pound & kg</option>
           </select>
           <hr/>
-          {index ==="xx" ? "Please select your units" : index === "0" ? <MinutesToHours /> : index === "1" ? <KmToMiles /> : index==="2"?<Test A="mb" B="gb" C="1024"/>:null}
+          {index ==="xx" ? "Please select your units" : index === "0" ? <MinutesToHours /> : index === "1" ? <KmToMiles /> : index==="2" ? <Converter x="mb" y="gb" calc="1024"/> : index==="3" ? <Converter y="kg" x="pound" calc="2.20462"/> : null}
         </div>
       );
     }
