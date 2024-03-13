@@ -8,13 +8,19 @@
   <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
   <!-- ReactDOM을 import -->
   <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  <!-- html에서 JSX 문법을 react로 변환하기 위해 babel import -->
+   <!-- React proptype import -->
+   <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+   <!-- html에서 JSX 문법을 react로 변환하기 위해 babel import -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <!-- babel을 통해 JSX를 react 언어로 변환하기 위해 script type을 변경 -->
   <script type="text/babel">
-    function Btn(props){
-      console.log(props.text,"was rendered");
-      return <button onClick={props.changeValue} style={{backgroundColor:"pink",color:"white",padding:"10px 20px",border:0,borderRadius:10,}}>{props.text}</button>
+    function Btn({ text, changeValue, fontSize=10 }){
+      console.log(text,"was rendered");
+      return <button onClick={changeValue} style={{backgroundColor:"pink",color:"white",padding:"10px 20px",border:0,borderRadius:10,fontSize}}>{text}</button>
+    }
+    Btn.propTypes = {
+      text : PropTypes.string.isRequired,
+      fontSize : PropTypes.number,
     }
     const MemorizedBtn = React.memo(Btn);
     function App(){
@@ -25,7 +31,7 @@
       return(
         <div>
           {Btn({text:"hi"})}
-          <MemorizedBtn text={value} changeValue={changeValue}/>
+          <MemorizedBtn text={value} changeValue={changeValue} fontSize={20}/>
           <MemorizedBtn text="Continue"/>
         </div>
       );
