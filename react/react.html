@@ -18,10 +18,11 @@
       console.log(text,"was rendered");
       return <button onClick={changeValue} style={{backgroundColor:"pink",color:"white",padding:"10px 20px",border:0,borderRadius:10,fontSize}}>{text}</button>
     }
+    //리액트에서 생성한 컴포넌트를 렌더링할 태그에 들어갈 prop의 변수TYPE 및 필수 여부 정의
     Btn.propTypes = {
       text : PropTypes.string.isRequired,
       fontSize : PropTypes.number,
-    }
+    }//리렌더링시 변경없는 항목은 리렌더링하지 않도록 저장
     const MemorizedBtn = React.memo(Btn);
     function App(){
       const [value,setValue] = React.useState("Save Changes");
