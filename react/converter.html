@@ -127,6 +127,56 @@
         </div>
       );
     }
+    function DollartoWon() {
+      //숫자 변수 생성
+      const [amount, setAmount] = React.useState(0);
+      //Km,Mile 변경 변수 생성
+      const [inverted, setInverted] = React.useState(false);
+      //숫자 변수 변경 시 동작 함수 생성
+      const onChange = (event) => {
+        //이벤트에서 input에 value 가져오기
+        setAmount(event.target.value);
+      }
+      //초기화 함수 생성
+      const reset = () => {
+        //숫자 초기값으로 적용
+        setAmount(0);
+      }
+      //Km,Mile 변경 함수 생성
+      const onInvert = () => {
+        //초기화 함수 호출
+        reset();
+        //true, false 변경
+        setInverted(current => !current);
+      }
+      return (
+        <div>
+          <div>
+            <label htmlFor="dollar">Dollar</label>
+            <input
+              id="dollar"
+              placeholder="Dollar"
+              type="number"
+              value={inverted ? amount / 1351.75 : amount}
+              onChange={onChange}
+              disabled={inverted}
+            />
+          </div>
+          <div>
+            <label htmlFor="won">Won</label>
+            <input
+              id="won"
+              placeholder="Won"
+              type="number"
+              value={inverted ? amount : amount * 1351.75}
+              onChange={onChange}
+              disabled={!inverted} />
+          </div>
+          <button onClick={reset}>Reset</button>
+          <button onClick={onInvert}>{inverted ? "Won to Dollar" : "Dollar to Won"}</button>
+        </div>
+      );
+    }
     function App(){
       const [index, setIndex] = React.useState("xx");
       const onSelect = (event) => {
@@ -142,9 +192,10 @@
             <option value="1">Km & Miles</option>
             <option value="2">mb & gb</option>
             <option value="3">pound & kg</option>
+            <option value="4">dollar to won</option>
           </select>
           <hr/>
-          {index ==="xx" ? "Please select your units" : index === "0" ? <MinutesToHours /> : index === "1" ? <KmToMiles /> : index==="2" ? <Converter x="mb" y="gb" calc="1024"/> : index==="3" ? <Converter y="kg" x="pound" calc="2.20462"/> : null}
+          {index ==="xx" ? "Please select your units" : index === "0" ? <MinutesToHours /> : index === "1" ? <KmToMiles /> : index==="2" ? <Converter x="mb" y="gb" calc="1024"/> : index==="3" ? <Converter y="kg" x="pound" calc="2.20462"/> : index === "4" ? <DollartoWon /> : null}
         </div>
       );
     }
