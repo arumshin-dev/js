@@ -128,6 +128,13 @@
       );
     }
     function DollartoWon() {
+      //달러 환율 변경 변수 생성
+      const [exRate, setExRate] = React.useState(0);
+      const getExRate = async () => {
+        const json = await (await fetch('https://quotation-api-cdn.dunamu.com/v1/forex/recent?codes=FRX.KRWUSD')).json();
+        setExRate(json[0].basePrice);
+      }
+      getExRate();
       //숫자 변수 생성
       const [amount, setAmount] = React.useState(0);
       //Km,Mile 변경 변수 생성
@@ -157,7 +164,7 @@
               id="dollar"
               placeholder="Dollar"
               type="number"
-              value={inverted ? amount / 1351.75 : amount}
+              value={inverted ? amount / exRate : amount}
               onChange={onChange}
               disabled={inverted}
             />
@@ -168,7 +175,7 @@
               id="won"
               placeholder="Won"
               type="number"
-              value={inverted ? amount : amount * 1351.75}
+              value={inverted ? amount : amount * exRate}
               onChange={onChange}
               disabled={!inverted} />
           </div>
