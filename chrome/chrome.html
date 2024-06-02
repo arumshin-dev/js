@@ -12,7 +12,9 @@
   <div class="container">
     <img class="background-image" src="" alt="Background Image"><!--배경이미지 깔리게-->
     <div class="top-bar">
-      <div><button id="refreshBackBtn" onclick="bgImage.src = 'https://picsum.photos/1200/800?random='+Math.floor(Math.random()*10);">램덤 배경 새로고침</button></div>
+      <div>
+        <button class="icon icon-theme-light " id="toggleTheme">Dark</button>
+        <button id="refreshBackBtn" onclick="bgImage.src = 'https://picsum.photos/1200/800?random='+Math.floor(Math.random()*10);">램덤 배경 새로고침</button></div>
       <div id="weather">
         <div>
           <p></p>
@@ -53,3 +55,27 @@
 </body>
 
 </html>
+<script>
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.documentElement.classList.add("dark");
+    document.getElementById("toggleTheme").innerText="Dark";
+    bgImage.style.filter='brightness(50%)';
+  }else{
+    document.getElementById("toggleTheme").innerText="Light";
+    bgImage.style.filter='';
+  }
+  // function toggleTheme() {
+  //   const root = document.documentElement;
+  //   root.classList.toggle('dark-theme');
+  // }
+  document.getElementById("toggleTheme").addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    if(document.documentElement.classList.contains('dark')){
+      document.getElementById("toggleTheme").innerText="Dark";
+      bgImage.style.filter='brightness(50%)';
+    }else{
+      document.getElementById("toggleTheme").innerText="Light";
+      bgImage.style.filter='';
+    }
+  });
+</script>

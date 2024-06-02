@@ -1,3 +1,66 @@
+
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+    color: white;
+  }
+}
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+  --text-color: #213547;
+  --background-color: #ffffff;
+  }
+  body {
+    background-color: white;
+    color: black;
+  }
+  a:hover {
+  color: #747bff;
+  }
+
+  button {
+  background-color: #f9f9f9;
+  color: var(--text-color);
+  }
+}
+html[theme=""] {
+  transition: 0.4s;
+}
+
+html[theme="dark-mode"] {
+/* ! */
+  filter: invert(100%) hue-rotate(180deg);
+  transition: 0.4s;
+}
+
+html {
+  --bg-color: #fff;
+  --text-color: #343434;
+  --link-color: #0000ee;
+}
+
+html.dark {
+  --bg-color: #121212;
+  --text-color: #bbb;
+  --link-color: #3ea6ff;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+a {
+  color: var(--link-color);
+}
+
+
+
 .hidden {
   display: none;
 }
@@ -41,7 +104,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
-  color: white;
+  color: var(--text-color);
 }
 
 .content h1 {
