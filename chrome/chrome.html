@@ -12,34 +12,36 @@
   <div class="container">
     <img class="background-image" src="" alt="Background Image"><!--배경이미지 깔리게-->
     <div class="top-bar">
-  <div id="weather">
-    <div>
-    <p></p>
-    <p></p>
-    <p></p>
-    </div>
-  </div>
+      <div><button id="refreshBackBtn" onclick="bgImage.src = 'https://picsum.photos/1200/800?random='+Math.floor(Math.random()*10);">램덤 배경 새로고침</button></div>
+      <div id="weather">
+        <div>
+          <p></p>
+          <p></p>
+          <p></p>
+        </div>
+      </div>
     </div>
     <div class="content">
       <h1>Welcome to arum Momentum</h1>
       <h2 id="clock">00:00:00</h2>
-  <form id="login-form" class="hidden">
-    <input required maxlength="15" type="text" placeholder="what is your name?"/>
-    <!--<input type="password" placeholder="password"/>-->
-    <input type="submit" value="Log In"/>
-  </form>
-  <h1 id="greeting" class="hidden"></h1>
-  <form id="todo-form">
-    <input type="text" placeholder="Write a To Do and Press Enter" required/>
-  </form>
-  <ul id="todo-list"></ul>
-  <div id="quote">
-    <span class="context"></span>
-    <span class="author"></span>
-    <span class="context"></span>
-    <span class="author"></span>
-  </div>
-  <!--<a href="https://www.google.com" target="_blank">go to google</a>-->
+      <form id="login-form" class="hidden">
+        <input required maxlength="15" type="text" placeholder="what is your name?" />
+        <!--<input type="password" placeholder="password"/>-->
+        <input type="submit" value="Log In" />
+      </form>
+      <h1 id="greeting" class="hidden"></h1>
+      <form id="todo-form">
+        <input type="text" placeholder="Write a To Do and Press Enter" required />
+      </form>
+      <ul id="todo-list"></ul>
+      <div id="quote">
+        <span class="context"></span>
+        <span class="author"></span>
+        <span class="context"></span>
+        <span class="author"></span>
+        <div><button id="refreshQuoteBtn" onclick="displayQuotes();">명언 새로고침</button></div>
+      </div>
+      <!--<a href="https://www.google.com" target="_blank">go to google</a>-->
     </div>
   </div>
   <script src="greeting.js"></script>

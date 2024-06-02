@@ -6,6 +6,10 @@ const chosenImage = images[Math.floor(Math.random() * images.length)];*/
 const bgImage = document.querySelector(".background-image");
 
 //bgImage.src = `${chosenImage}`;
-bgImage.src = 'https://picsum.photos/1200/800'; // 무작위 이미지 URL
+// bgImage.src = 'https://picsum.photos/1200/800'; // 무작위 이미지 URL
 
 //document.body.appendChild(bgImage);
+function getBackground(){
+  bgImage.src = `https://picsum.photos/${window.innerWidth}/${window.innerHeight}?random=${Math.floor(Math.random()*100)}`;
+}
+getBackground();
