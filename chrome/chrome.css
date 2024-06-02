@@ -200,3 +200,27 @@ input[type="text"]:focus {
 #quote .author {
   font-weight: bold;
 }
+
+
+.bq-randomBtn {
+  /* top: 17px;
+  right: 20px;
+  z-index: 0; */
+  fill: #fd7c7c;
+  /* position: absolute; */
+  width: 24px;
+  cursor: pointer;
+}
+.bq-randomBtn:hover {
+  animation: 2s linear infinite spin;
+  fill: #ff3434;
+}
+@keyframes spin {
+  0% {
+      transform: rotate(0);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}
