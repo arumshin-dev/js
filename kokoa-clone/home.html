@@ -4,6 +4,9 @@
     <title>Home - My first website.</title>
     <link href="styles.css" rel="styleSheet" />
     <style>
+      *{
+        border: 2px dashed black;
+      }
       html {
         background-color: tomato;
       }
@@ -14,6 +17,7 @@
       }
       div {
         padding: 10px;
+        border: 2px solid black;
       }
       #first {
         background-color: whitesmoke;
@@ -30,10 +34,8 @@
         height: 50px;
         width: 50px;
       }
-      #fourth {
-        background-color: blanchedalmond;
-        height: 25px;
-        width: 25px;
+      span{
+        border-style: dotted;
       }
     </style>
   </head>
@@ -41,7 +43,7 @@
     <div id="first">
       <div id="second">
         <div id="third">
-          <div id="fourth"></div>
+          <span>hello</span>
         </div>
       </div>
     </div>
