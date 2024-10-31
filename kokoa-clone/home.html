@@ -5,23 +5,31 @@
     <link href="styles.css" rel="styleSheet" />
     <style>
       body {
+        height: 100vh;
         margin: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
       }
       div {
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 300px;
+        font-size: 28px;
+        color: white;
         height: 300px;
         background-color: teal;
-        margin-right: 10.015px;
+      }
+      #second {
+        background-color: wheat;
       }
     </style>
   </head>
   <body>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+    <div>1</div>
+    <div id="second">2</div>
+    <div>3</div>
   </body>  
 </html>
