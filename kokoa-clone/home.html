@@ -5,32 +5,27 @@
     <link href="styles.css" rel="styleSheet" />
     <style>
       body {
-        height: 100vh;
+        height: 1000vh;
         margin: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: row-reverse;
-        flex-wrap: wrap-reverse;
       }
       div {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         width: 300px;
-        font-size: 28px;
-        color: white;
         height: 300px;
+        color: white;
         background-color: teal;
       }
-      #second {
+      #green {
+        background-color: teal;
+        position: fixed;
+        opacity: 0.2;
+      }
+      #different {
         background-color: wheat;
       }
     </style>
   </head>
   <body>
-    <div>1</div>
-    <div id="second">2</div>
-    <div>3</div>
+    <div id="green"></div>
+    <div id="different"></div>
   </body>  
 </html>
