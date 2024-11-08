@@ -11,11 +11,12 @@
         padding: 3px 5px;
         border-radius: 5px;
         font-size: 55px;
-        transition: all 5s ease-in-out;
+        transition: color 1s cubic-bezier(0.600, -0.280, 0.735, 0.045) /* easeInBack */,
+          background-color 5s ease-in-out, border-radius 3s ease-out;
       }
       
       a:hover {
-        border-radius: 15px;
+        border-radius: 25px;
         color: tomato;
         background-color: wheat;
       }
