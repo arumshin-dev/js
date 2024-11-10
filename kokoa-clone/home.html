@@ -4,13 +4,18 @@
     <title>Home - My first website.</title>
     <link href="styles.css" rel="styleSheet" />
     <style>
+      @keyframes superSexyCoinFlip {
+        from {
+          transform: rotateY(0);
+        }
+        to {
+          transform: rotateY(180deg) translateX(100px);
+        }
+      }
       img {
         border: 5px solid black;
         border-radius: 50%;
-        transition: transform 2s ease-in-out;
-      }
-      img:hover {
-        transform: matrix(1, 2, 3, 4, 5, 6);
+        animation: superSexyCoinFlip 5s ease-in-out infinite;
       }
     </style>
   </head>
