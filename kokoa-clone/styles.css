@@ -15,6 +15,7 @@
 @import "find.css";
 @import "more.css";
 @import "settings.css";
+@import "chat.css";
 
 body {
   color: #2e363e;
