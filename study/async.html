@@ -7,8 +7,40 @@
 </head>
 <body>
   <script src="async.js"></script>
+  
   <script>
+    function test(){
+      console.log(x);
+    }
+    function test1(x=7){
+      console.log(x);
+    }
+function a(data=0){
+  //12월에 글을 썼는지?
+  if(b(data)){
+    //글이 없어서 팝업 열어줌
+    console.log("a true");
+  }else{
+    //이미 글 있음 등록 팝업 안열어주고 경고창 쓴글이 있다는
+    console.log("a false");
+    alert("쓴 글이 있습니다.");
+  }
+}
 
+    function b(data=0){
+      
+      //server select
+      
+      if(data>0){
+        //12월에 쓴 글이 있다.
+        console.log("b false");
+        return false;
+      }else{
+        //12월에 쓴 글이 없다.
+        console.log("b true");
+        return true;
+      }
+    }
   </script>
 </body>
 </html>
