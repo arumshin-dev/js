@@ -2,8 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Drag-n-drop external events - Demos | FullCalendar</title>
-  <style data-fullcalendar=""></style>
+  <title>External Dragging Demo - FullCalendar</title>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -12,9 +11,7 @@
 
       var containerEl = document.getElementById('external-events');
       var calendarEl = document.getElementById('calendar');
-      var checkbox = document.getElementById('drop-remove');
 
-      // initialize the external events
       new Draggable(containerEl, {
         itemSelector: '.fc-event',
         eventData: function (eventEl) {
@@ -24,7 +21,6 @@
         }
       });
 
-      // initialize the calendar
       var calendar = new Calendar(calendarEl, {
         headerToolbar: {
           left: 'prev,next today',
@@ -32,11 +28,10 @@
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         editable: true,
-        droppable: true, // this allows things to be dropped onto the calendar
+        droppable: true,
         drop: function (info) {
-          // is the "remove after drop" checkbox checked?
-          if (checkbox.checked) {
-            // if so, remove the element from the "Draggable Events" list
+          // remove element from draggable list if checkbox is checked
+          if (document.getElementById('drop-remove').checked) {
             info.draggedEl.parentNode.removeChild(info.draggedEl);
           }
         }
@@ -59,25 +54,14 @@
       top: 20px;
       left: 20px;
       width: 150px;
-      padding: 0 10px;
+      padding: 10px;
       border: 1px solid #ccc;
       background: #eee;
-    }
-
-    .demo-topbar+#external-events {
-      /* will get stripped out */
-      top: 60px;
     }
 
     #external-events .fc-event {
       cursor: move;
       margin: 3px 0;
-    }
-
-    #calendar-container {
-      position: relative;
-      z-index: 1;
-      margin-left: 200px;
     }
 
     #calendar {
@@ -89,29 +73,16 @@
 <body>
   <div id="external-events">
     <p><strong>Draggable Events</strong></p>
-    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-      <div class="fc-event-main">My Event 1</div>
-    </div>
-    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-      <div class="fc-event-main">My Event 2</div>
-    </div>
-    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-      <div class="fc-event-main">My Event 3</div>
-    </div>
-    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-      <div class="fc-event-main">My Event 4</div>
-    </div>
-    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-      <div class="fc-event-main">My Event 5</div>
-    </div>
+    <div class="fc-event">Event 1</div>
+    <div class="fc-event">Event 2</div>
+    <div class="fc-event">Event 3</div>
+    <div class="fc-event">Event 4</div>
+    <div class="fc-event">Event 5</div>
     <p>
       <input type="checkbox" id="drop-remove">
-      <label for="drop-remove">remove after drop</label>
+      <label for="drop-remove">Remove after drop</label>
     </p>
   </div>
-
-  <div id="calendar-container">
-    <div id="calendar" class="fc fc-media-screen fc-direction-ltr fc-theme-standard"></div>
-  </div>
+  <div id="calendar"></div>
 </body>
 </html>
