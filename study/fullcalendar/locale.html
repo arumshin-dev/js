@@ -4,42 +4,44 @@
   <meta charset="utf-8">
   <title>Locale Demo - FullCalendar</title>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var Calendar = FullCalendar.Calendar;
+    document.addEventListener('DOMContentLoaded', function() {
+      var initialLocaleCode = 'en';
+      var localeSelectorEl = document.getElementById('locale-selector');
       var calendarEl = document.getElementById('calendar');
-      var localeSelector = document.getElementById('locale-selector');
 
-      var calendar = new Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'en', // Default locale
+      var calendar = new FullCalendar.Calendar(calendarEl, {
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
         },
-        events: [
-          {
-            title: 'Meeting',
-            start: '2025-01-10T10:00:00',
-            end: '2025-01-10T12:00:00'
-          },
-          {
-            title: 'Lunch',
-            start: '2025-01-11T12:00:00'
-          },
-          {
-            title: 'Project Deadline',
-            start: '2025-01-15'
-          }
-        ]
+        locale: initialLocaleCode,
+        buttonIcons: false, // show the prev/next text
+        weekNumbers: true,
+        navLinks: true, // can click day/week names to navigate views
+        editable: true,
+        dayMaxEvents: true, // allow "more" link when too many events
+        events: 'https://fullcalendar.io/api/demo-feeds/events.json?overload-day'
       });
 
       calendar.render();
 
-      // Update calendar locale on selector change
-      localeSelector.addEventListener('change', function () {
-        calendar.setOption('locale', this.value);
+      // build the locale selector's options
+      calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
+        var optionEl = document.createElement('option');
+        optionEl.value = localeCode;
+        optionEl.selected = localeCode == initialLocaleCode;
+        optionEl.innerText = localeCode;
+        localeSelectorEl.appendChild(optionEl);
+      });
+
+      // when the selected option changes, dynamically change the calendar option
+      localeSelectorEl.addEventListener('change', function() {
+        if (this.value) {
+          calendar.setOption('locale', this.value);
+        }
       });
     });
   </script>
@@ -70,10 +72,6 @@
 <body>
   <select id="locale-selector">
     <option value="en">English</option>
-    <option value="ko">Korean</option>
-    <option value="es">Spanish</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
   </select>
   <div id="calendar"></div>
 </body>
