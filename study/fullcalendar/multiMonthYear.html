@@ -5,23 +5,14 @@
   <title>Multi-month Grid Demo - FullCalendar</title>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var Calendar = FullCalendar.Calendar;
+    document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
 
-      var calendar = new Calendar(calendarEl, {
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        timeZone: 'UTC',
         initialView: 'multiMonthYear',
-        views: {
-          multiMonthYear: {
-            type: 'multiMonth',
-            duration: { years: 1 }
-          }
-        },
-        headerToolbar: {
-          left: 'prev,next',
-          center: 'title',
-          right: 'today'
-        }
+        editable: true,
+        events: 'https://fullcalendar.io/api/demo-feeds/events.json'
       });
 
       calendar.render();
