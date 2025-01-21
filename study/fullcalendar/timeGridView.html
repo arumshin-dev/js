@@ -11,11 +11,18 @@
 
       var calendar = new FullCalendar.Calendar(calendarEl, {
         timeZone: 'UTC',
-        initialView: 'timeGridWeek',
+        initialView: 'timeGridFourDay',
         headerToolbar: {
-          left: 'prev,next today',
+          left: 'prev,next',
           center: 'title',
-          right: 'timeGridWeek,timeGridDay'
+          right: 'timeGridDay,timeGridFourDay'
+        },
+        views: {
+          timeGridFourDay: {
+            type: 'timeGrid',
+            duration: { days: 4 },
+            buttonText: '4 day'
+          }
         },
         events: 'https://fullcalendar.io/api/demo-feeds/events.json'
       });
