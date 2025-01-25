@@ -3,57 +3,62 @@
 <head>
   <meta charset="utf-8">
   <title>Vertical Resource View Demo - FullCalendar</title>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script> -->
+  <!-- FullCalendar 스케줄러 라이브러리 추가 -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/index.global.min.js'></script>
   <script>
+    // DOM이 로드된 후 실행
     document.addEventListener('DOMContentLoaded', function() {
-      var initialLocaleCode = 'en';
-      var localeSelectorEl = document.getElementById('locale-selector');
-      var calendarEl = document.getElementById('calendar');
+      var initialLocaleCode = 'en'; // 초기 언어 코드 설정
+      var localeSelectorEl = document.getElementById('locale-selector'); // 언어 선택 요소
+      var calendarEl = document.getElementById('calendar'); // 캘린더 요소
 
+      // FullCalendar 인스턴스 생성
       var calendar = new FullCalendar.Calendar(calendarEl, {
         headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+          left: 'prev,next today', // 툴바 왼쪽: 이전, 다음, 오늘 버튼
+          center: 'title', // 툴바 중앙: 캘린더 제목
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth' // 툴바 오른쪽: 뷰 옵션
         },
-        locale: initialLocaleCode,
-        buttonIcons: false, // show the prev/next text
-        weekNumbers: true,
-        navLinks: true, // can click day/week names to navigate views
-        editable: true,
-        dayMaxEvents: true, // allow "more" link when too many events
-        events: 'https://fullcalendar.io/api/demo-feeds/events.json?overload-day'
+        locale: initialLocaleCode, // 초기 언어 코드
+        buttonIcons: false, // 이전/다음 버튼의 텍스트 표시
+        weekNumbers: true, // 주 번호 표시
+        navLinks: true, // 날짜/주 이름 클릭 시 해당 뷰로 이동 가능
+        editable: true, // 일정 편집 가능
+        dayMaxEvents: true, // 일정이 많을 경우 '더보기' 링크 표시
+        events: 'https://fullcalendar.io/api/demo-feeds/events.json?overload-day' // 일정 데이터 URL
       });
 
+      // 캘린더 렌더링
       calendar.render();
 
-      // build the locale selector's options
+      // 언어 선택 옵션 추가
       calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
-        var optionEl = document.createElement('option');
-        optionEl.value = localeCode;
-        optionEl.selected = localeCode == initialLocaleCode;
-        optionEl.innerText = localeCode;
-        localeSelectorEl.appendChild(optionEl);
+        var optionEl = document.createElement('option'); // <option> 요소 생성
+        optionEl.value = localeCode; // 언어 코드 값을 설정
+        optionEl.selected = localeCode == initialLocaleCode; // 초기 언어와 일치하는 경우 선택
+        optionEl.innerText = localeCode; // 옵션 텍스트 설정
+        localeSelectorEl.appendChild(optionEl); // 언어 선택 박스에 추가
       });
 
-      // when the selected option changes, dynamically change the calendar option
+      // 언어 선택 박스 변경 시 캘린더 언어 동적으로 변경
       localeSelectorEl.addEventListener('change', function() {
         if (this.value) {
-          calendar.setOption('locale', this.value);
+          calendar.setOption('locale', this.value); // 선택된 언어로 캘린더 업데이트
         }
       });
 
     });
   </script>
   <style>
+    /* 기본 스타일 초기화 */
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-      font-size: 14px;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif; /* 기본 폰트 */
+      font-size: 14px; /* 폰트 크기 */
     }
 
+    /* 상단 바 스타일 */
     #top {
       background: #eee;
       border-bottom: 1px solid #ddd;
@@ -62,14 +67,16 @@
       font-size: 12px;
     }
 
+    /* 캘린더 스타일 */
     #calendar {
-      max-width: 1100px;
-      margin: 40px auto;
+      max-width: 1100px; /* 캘린더 최대 너비 */
+      margin: 40px auto; /* 화면 중앙에 배치 */
       padding: 0 10px;
     }
   </style>
 </head>
 <body>
+  <!-- 캘린더 영역 -->
   <div id="calendar"></div>
 </body>
 </html>
