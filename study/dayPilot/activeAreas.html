@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Time Header Active Areas - JavaScript Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+    #scheduler {
+      max-width: 1100px;
+      margin: 20px auto;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="scheduler"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dp = new DayPilot.Scheduler("scheduler", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+          { groupBy: "Month", format: "MMMM yyyy" },
+          { groupBy: "Month", height: 24 }
+        ],
+        treeEnabled: true,
+        resources: [
+          { name: "Room A", id: "A" },
+          { name: "Room B", id: "B" },
+          { name: "Room C", id: "C" },
+          { name: "Room D", id: "D" },
+          { name: "Room E", id: "E" },
+          { name: "Room F", id: "F" },
+          { name: "Room G", id: "G" },
+          { name: "Room H", id: "H" },
+          { name: "Room I", id: "I" },
+          { name: "Room J", id: "J" },
+          { name: "Room K", id: "K" }
+        ],
+        heightSpec: "Fixed",
+        height: 200,
+        rowMarginTop: 5,
+        onTimeRangeSelected: async args => {
+          const modal = await DayPilot.Modal.prompt("새 이벤트 이름 입력:", "이벤트");
+          dp.clearSelection();
+          if (modal.canceled) {
+            return;
+          }
+          dp.events.add({
+            start: args.start,
+            end: args.end,
+            id: DayPilot.guid(),
+            resource: args.resource,
+            text: modal.result
+          });
+          dp.message("이벤트가 생성되었습니다.");
+        },
+        onBeforeTimeHeaderRender: args => {
+          if (args.header.level === 0) {
+            const style = "text-align: center; font-weight: bold; cursor: pointer; border-radius: 10px; border: 1px solid #ccc; background-color: #fff;";
+            args.header.areas = [
+              {
+                right: 6,
+                top: 6,
+                height: 16,
+                width: 16,
+                html: "i",
+                style: style,
+                action: "None",
+                onClick: args => {
+                  const header = args.source;
+                  DayPilot.Modal.alert('시간 슬롯 클릭됨: ' + header.start.toString('yyyy-MM-dd HH:mm:ss') + ' - ' + header.end.toString('yyyy-MM-dd HH:mm:ss'));
+                }
+              },
+            ];
+          } else if (args.header.level === 1) {
+            const point1 = args.header.start.addDays(10);
+            const point2 = args.header.start.addDays(20);
+            const padding = 3;
+            args.header.areas = [
+              { start: args.header.start, end: point1, top: padding, bottom: padding, backColor: "#cc0000", style: "border-radius: 10px;" },
+              { start: point1, end: point2, top: padding, bottom: padding, backColor: "#f1c232", style: "border-radius: 10px;" },
+              { start: point2, end: args.header.end, top: padding, bottom: padding, backColor: "#6aa84f", style: "border-radius: 10px;" },
+            ];
+
+            args.header.html = "";
+          }
+        }
+      });
+
+      dp.init();
+      dp.scrollTo("2025-03-25");
+
+      const app = {
+        init() {
+          this.loadEventData();
+        },
+        loadEventData() {
+          // 이벤트 데이터 생성 및 로드
+          const events = [];
+          for (let i = 0; i < 15; i++) {
+            const duration = Math.floor(Math.random() * 6) + 1; // 1~6 시간
+            const durationDays = Math.floor(Math.random() * 6 + 2); // 2~7 일
+            const start = Math.floor(Math.random() * 6) + 2; // 2~7 일 시작
+
+            const resId = String.fromCharCode(65 + i); // A, B, C, D 등의 리소스 ID
+
+            const event = {
+              start: new DayPilot.Date("2025-03-25T00:00:00").addDays(start),
+              end: new DayPilot.Date("2025-03-25T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+              id: DayPilot.guid(),
+              resource: resId,
+              text: `이벤트 ${i + 1}`
+            };
+
+            events.push(event);
+          }
+          dp.update({ events });
+        }
+      };
+
+      app.init();
+    });
+  </script>
+</body>
+</html>
