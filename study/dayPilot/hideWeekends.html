@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Hide Weekends - JavaScript Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+    #scheduler {
+      max-width: 1100px;
+      margin: 20px auto;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="scheduler"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dp = new DayPilot.Scheduler("scheduler", {
+        startDate: new DayPilot.Date("2025-03-01"), // 시작 날짜
+        days: new DayPilot.Date("2025-03-01").daysInMonth(), // 3월 전체 표시
+        scale: "Day", // 하루 단위로 표시
+        cellWidth: 100, // 셀 너비 지정
+        resources: [
+          { name: "Room A", id: "A" },
+          { name: "Room B", id: "B" },
+          { name: "Room C", id: "C" },
+          { name: "Room D", id: "D" },
+          { name: "Room E", id: "E" },
+          { name: "Room F", id: "F" }
+        ],
+        timeHeaders: [
+          { groupBy: "Month", format: "MMMM yyyy" }, // 월 헤더
+          { groupBy: "Day", format: "dddd d" } // 요일 + 날짜 표시 (예: Monday 3)
+        ],
+        onIncludeTimeCell: args => {
+          // 주말 (토, 일) 숨김 처리
+          if (args.cell.start.getDayOfWeek() === 0 || args.cell.start.getDayOfWeek() === 6) {
+            args.cell.visible = false;
+          }
+        },
+        timeRangeSelectingStartEndEnabled: true,
+        onTimeRangeSelected: async args => {
+          const modal = await DayPilot.Modal.prompt("새 이벤트 이름을 입력하세요:", "이벤트");
+          dp.clearSelection();
+          if (modal.canceled) {
+            return;
+          }
+          dp.events.add({
+            start: args.start,
+            end: args.end,
+            id: DayPilot.guid(),
+            resource: args.resource,
+            text: modal.result
+          });
+          dp.message("이벤트가 생성되었습니다.");
+        }
+      });
+
+      dp.init();
+
+      const app = {
+        init() {
+          this.loadEventData();
+        },
+        loadEventData() {
+          // 더미 이벤트 생성
+          const events = [];
+
+          for (let i = 0; i < 10; i++) {
+            const durationDays = 1; // 이벤트 지속일 (1일)
+            const start = Math.floor(Math.random() * 4); // 랜덤한 시작일
+
+            const resId = String.fromCharCode(65 + i % 6); // Room A ~ F 중 랜덤 배치
+
+            const event = {
+              start: new DayPilot.Date("2025-03-06T00:00:00").addDays(start),
+              end: new DayPilot.Date("2025-03-06T00:00:00").addDays(start).addDays(durationDays),
+              id: DayPilot.guid(),
+              resource: resId,
+              text: `Event ${i + 1}`
+            };
+
+            events.push(event);
+          }
+          dp.update({ events });
+        }
+      };
+
+      app.init();
+    });
+  </script>
+
+</body>
+</html>
