@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Hiding Non-Business Hours - JavaScript Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+    #scheduler {
+      max-width: 1100px;
+      margin: 20px auto;
+      height: 350px;
+    }
+    #toolbar {
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toolbar">
+    <label>Scale:
+      <input type="radio" name="scale" value="Hour" checked> Hours
+      <input type="radio" name="scale" value="Day"> Days
+    </label>
+  </div>
+
+  <div id="scheduler"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const scheduler = new DayPilot.Scheduler("scheduler", {
+        startDate: "2025-01-01",  // 시작 날짜
+        days: 62,  // 표시할 일 수 (2개월)
+        cellWidth: 50,  // 시간 단위 셀 너비
+        scale: "Hour",  // 기본 시간 단위 (시간)
+        timeHeaders: [
+          { groupBy: "Month", format: "MMMM yyyy" },  // 월 헤더
+          { groupBy: "Day", format: "dddd d" },  // 요일 + 날짜
+          { groupBy: "Hour" }  // 시간 단위 헤더
+        ],
+        treeEnabled: true,
+        resources: [
+          { name: "Room A", id: "A" },
+          { name: "Room B", id: "B" },
+          { name: "Room C", id: "C" },
+          { name: "Room D", id: "D" },
+          { name: "Room E", id: "E" },
+          { name: "Room F", id: "F" },
+          { name: "Room G", id: "G" }
+        ],
+        showNonBusiness: false, // 비업무 시간 숨김
+        businessBeginsHour: 9, // 업무 시작 시간 (오전 9시)
+        businessEndsHour: 18, // 업무 종료 시간 (오후 6시)
+        timeRangeSelectingStartEndFormat: "h:mm tt MMMM d, yyyy", // 선택 시간 포맷
+        height: 250,
+        onTimeRangeSelected: async args => {
+          const modal = await DayPilot.Modal.prompt("새 이벤트 이름을 입력하세요:", "이벤트");
+          scheduler.clearSelection();
+          if (modal.canceled) {
+            return;
+          }
+          scheduler.events.add({
+            start: args.start,
+            end: args.end,
+            id: DayPilot.guid(),
+            resource: args.resource,
+            text: modal.result
+          });
+          scheduler.message("이벤트가 생성되었습니다.");
+        }
+      });
+
+      scheduler.init();
+
+      const app = {
+        timeHeaders: {
+          Hour: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Day", format: "d" },
+            { groupBy: "Hour" }
+          ],
+          Day: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Day", format: "d" }
+          ]
+        },
+        init() {
+          this.addEventHandlers();
+        },
+        addEventHandlers() {
+          document.querySelectorAll("input[type=radio]").forEach(function(el) {
+            el.addEventListener("change", function(ev) {
+              const val = document.querySelector("input[type=radio]:checked").value;
+              scheduler.scale = val;
+              scheduler.timeHeaders = app.timeHeaders[val];
+              scheduler.update();
+            });
+          });
+        }
+      };
+
+      app.init();
+    });
+  </script>
+
+</body>
+</html>
