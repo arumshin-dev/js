@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Scale: Days (JavaScript Scheduler)</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+      html, body {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+      }
+
+      #dp {
+          max-width: 1200px;
+          margin: 20px auto;
+      }
+  </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: "2025-03-01",
+            days: 300,
+            timeHeaders: [
+                { groupBy: "Month" },
+                { groupBy: "Week" },
+                { groupBy: "Cell", format: "d" }
+            ],
+            scale: "Day",
+            treeEnabled: true,
+            resources: [
+                { name: "Room A", id: "A" },
+                { name: "Room B", id: "B" },
+                { name: "Room C", id: "C" },
+                { name: "Room D", id: "D" },
+                { name: "Room E", id: "E" },
+                { name: "Room F", id: "F" },
+                { name: "Room G", id: "G" },
+                { name: "Room H", id: "H" },
+                { name: "Room I", id: "I" },
+                { name: "Room J", id: "J" },
+                { name: "Room K", id: "K" }
+            ],
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) return;
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            height: 350
+        });
+
+        dp.init();
+        dp.scrollTo("2025-03-25");
+
+    </script>
+
+</body>
+</html>
