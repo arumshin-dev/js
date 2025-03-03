@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Scale: Custom (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #dp {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            // 타임 헤더 설정 (연도, 월, 날짜)
+            timeHeaders: [
+                { groupBy: "Year" },
+                { groupBy: "Month" },
+                { groupBy: "Cell", format: "d" }
+            ],
+
+            scale: "Manual",  // 커스텀 타임라인 사용
+            timeline: createTimeline(),  // 타임라인 생성 함수 호출
+            treeEnabled: true,
+
+            // 리소스 (회의실 목록)
+            resources: [
+                { name: "Room A", id: "A" },
+                { name: "Room B", id: "B" },
+                { name: "Room C", id: "C" },
+                { name: "Room D", id: "D" },
+                { name: "Room E", id: "E" },
+                { name: "Room F", id: "F" },
+                { name: "Room G", id: "G" },
+                { name: "Room H", id: "H" },
+                { name: "Room I", id: "I" },
+                { name: "Room J", id: "J" }
+            ],
+
+            // 이벤트 추가 기능
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) {
+                    return;
+                }
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+
+            // 타임 헤더 커스터마이징
+            onBeforeTimeHeaderRender: args => {
+                if (args.header.level === 2) {
+                    var duration = new DayPilot.Duration(args.header.start, args.header.end);
+                    if (duration.totalDays() > 1) {
+                        args.header.html = "";
+                    }
+                }
+            },
+
+            height: 350
+        });
+
+        dp.init();
+
+        // 커스텀 타임라인 생성 함수
+        function createTimeline() {
+            const timeline = [];
+            const start = new DayPilot.Date("2025-03-01");
+
+            // 3월 1일부터 31일까지 1일 단위로 설정
+            for (let i = 0; i < 31; i++) {
+                const day = {};
+                day.start = start.addDays(i);
+                day.end = day.start.addDays(1);
+                timeline.push(day);
+            }
+
+            // 이후 3개월을 한 칸으로 설정
+            for (let i = 0; i < 3; i++) {
+                const month = {};
+                month.start = start.addDays(31).addMonths(i);
+                month.end = month.start.addMonths(1);
+                month.width = 100;  // 셀 너비 설정
+                timeline.push(month);
+            }
+
+            return timeline;
+        }
+    </script>
+
+</body>
+</html>
