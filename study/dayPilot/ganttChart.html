@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Chart (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #dp {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            viewType: "Gantt",  // Gantt 차트 모드 설정
+            cellWidth: 60,  // 셀 너비 설정 (시간 간격)
+            durationBarMode: "PercentComplete",  // 진행률 바 스타일
+
+            // 이벤트 렌더링 전에 수행되는 작업
+            onBeforeEventRender: args => {
+                args.data.html = args.data.complete + "%";  // 진행률을 이벤트 내부에 표시
+                args.data.moveVDisabled = true;  // 세로 이동 비활성화 (Gantt 차트에서는 필요 없음)
+            },
+
+            // 행 헤더 설정 (이벤트 이름, 상세 정보)
+            rowHeaderColumns: [
+                { name: "Name" },
+                { name: "Details" }
+            ]
+        });
+
+        dp.init();
+
+        // Gantt 차트 데이터 로딩
+        const app = {
+            init() {
+                this.loadEventData();
+            },
+
+            loadEventData() {
+                let start = new DayPilot.Date("2025-03-04T00:00:00"); // 시작 날짜 설정
+                const events = [];
+
+                for (let i = 0; i < 10; i++) {
+                    const duration = Math.floor(Math.random() * 3) + 1; // 1~3시간 지속
+                    const end = start.addHours(duration);
+                    const text = `Event ${i}`;
+
+                    const event = {
+                        start: start,
+                        end: end,
+                        id: DayPilot.guid(),
+                        text: text,
+                        complete: Math.floor(Math.random() * 101), // 0~100% 진행률
+                        columns: [{ text: text }, { text: `Event ${i} details` }]
+                    };
+
+                    events.push(event);
+                    start = end;  // 다음 이벤트는 이전 이벤트가 끝난 후 시작
+                }
+
+                dp.events.list = events;
+                dp.update();
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+</html>
