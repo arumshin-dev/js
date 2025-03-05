@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #dp {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: DayPilot.Date.today().firstDayOfMonth(),
+            viewType: "Days",
+            days: DayPilot.Date.today().daysInMonth(),
+            cellDuration: 15,
+            scale: "CellDuration",
+            timeHeaders: [
+                {groupBy: "Hour"},
+                {groupBy: "Cell"}
+            ],
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) return;
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            rowHeaderColumns: [
+                {title: "Date"},
+                {title: "Day", width: 30}
+            ],
+            showNonBusiness: true,
+            cellWidthSpec: "Auto",
+            cellWidthMin: 25,
+            businessWeekends: false,
+            onBeforeCellRender: args => {
+                // 주말 비활성화
+                const day = args.cell.start.getDayOfWeek();
+                if (day === 6 || day === 0) {
+                    args.cell.disabled = true;
+                }
+            },
+            onBeforeRowHeaderRender: args => {
+                args.row.horizontalAlignment = "center";
+                args.row.columns[1].html = args.row.start.toString("ddd");
+                args.row.columns[1].horizontalAlignment = "center";
+            },
+            height: 350
+        });
+
+        dp.init();
+        dp.scrollTo(DayPilot.Date.today().firstDayOfMonth().addHours(9));
+
+        const app = {
+            init() {
+                this.loadEventData();
+            },
+            loadEventData() {
+                // 이벤트 생성 및 로드
+                const events = [];
+                for (let i = 0; i < 31; i++) {
+                    const start = Math.floor(Math.random() * 6);
+                    const duration = Math.floor(Math.random() * 3) + 1; // 1~3시간 지속
+                    const from = DayPilot.Date.today().firstDayOfMonth().addHours(9);
+
+                    const event = {
+                        start: from.addDays(i).addHours(start),
+                        end: from.addDays(i).addHours(start + duration),
+                        id: DayPilot.guid(),
+                        text: `Event ${i}`,
+                        bubbleHtml: `${from.addDays(i).addHours(start)} - ${from.addDays(i).addHours(start + duration)}`
+                    };
+
+                    events.push(event);
+                }
+                dp.update({events});
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+</html>
