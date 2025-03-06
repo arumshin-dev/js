@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year View (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #dp {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            days: 31,
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Day", format: "d"}
+            ],
+            cellWidthSpec: "Auto",
+            heightSpec: "Max",
+            height: 500,
+            eventMovingStartEndEnabled: true,
+            timeRangeSelectingStartEndEnabled: true,
+            onTimeRangeSelected: async (args) => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "New Event")
+                dp.clearSelection();
+                if (modal.canceled) {
+                    return;
+                }
+                const name = modal.result;
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    text: name
+                });
+                dp.message("Created");
+            },
+            onBeforeCellRender: args => {
+                const belongsToCurrentMonth = args.cell.x + 1 === args.cell.start.getDay();
+
+                if (!belongsToCurrentMonth) {
+                    args.cell.properties.backColor = "#dddddd";
+                }
+                else {
+                    args.cell.properties.fontColor = "#dddddd";
+                    args.cell.properties.text = args.cell.start.toString("ddd");
+                    args.cell.properties.verticalAlignment = "center";
+                    args.cell.properties.horizontalAlignment = "center";
+                }
+            },
+            durationBarVisible: false,
+        });
+
+        dp.init();
+
+        const app = {
+            loadData() {
+                const resources = [];
+                const startDate = DayPilot.Date.today().firstDayOfYear();
+
+                for (let i = 0; i < 12; i++) {
+                    const month = startDate.addMonths(i);
+                    resources.push({
+                        name: month.toString("MMMM"),
+                        start: month,
+                        end: month.addMonths(1),
+                    });
+                }
+
+                const events = [
+                    {
+                        start: startDate.addMonths(1).addDays(1),
+                        end: startDate.addMonths(1).addDays(6),
+                        id: DayPilot.guid(),
+                        text: "Event 1",
+                    },
+                    {
+                        start: startDate.addMonths(3).addDays(2),
+                        end: startDate.addMonths(3).addDays(10),
+                        id: DayPilot.guid(),
+                        text: "Event 2",
+                    },
+                ];
+
+                dp.update({
+                    resources,
+                    events,
+                    startDate
+                });
+            },
+        };
+
+        app.loadData();
+    </script>
+
+</body>
+</html>
