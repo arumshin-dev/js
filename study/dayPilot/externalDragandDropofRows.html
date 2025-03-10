@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Drag and Drop of Rows</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        #layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        #external {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+        #external ul {
+            list-style: none;
+            padding: 0;
+        }
+        #external li {
+            padding: 5px;
+            margin: 5px 0;
+            background: #f0f0f0;
+            cursor: move;
+        }
+        #dp {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="layout">
+        <div id="external">
+            <strong>Drag resources from this list to the scheduler as rows:</strong>
+            <ul>
+                <li data-id="Room1">Room 1</li>
+                <li data-id="Room2">Room 2</li>
+            </ul>
+        </div>
+        <div id="dp"></div>
+    </div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: new DayPilot.Date("2025-03-01"),
+            days: new DayPilot.Date("2025-03-01").daysInMonth(),
+            scale: "Hour",
+            timeHeaders: [
+                {groupBy: "Day"},
+                {groupBy: "Hour"}
+            ],
+            treeEnabled: true,
+            resources: [
+                {name: "Room A", id: "A"},
+                {name: "Room B", id: "B"},
+                {name: "Room C", id: "C"},
+                {name: "Room D", id: "D"},
+                {name: "Room E", id: "E"},
+                {name: "Room F", id: "F"},
+            ],
+            onRowMoving: args => {
+                console.log("onRowMoving", args);
+            },
+            onRowMove: args => {
+                console.log("onRowMove", args);
+            },
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) {
+                    return;
+                }
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            dragOutAllowed: true,
+            rowMoveHandling: "Update",
+        });
+
+        dp.init();
+
+        const app = {
+            init() {
+                this.makeDraggable();
+                this.registerDropTarget();
+            },
+            makeDraggable() {
+                // 외부 리스트 항목을 드래그 가능하도록 설정
+                const parent = document.getElementById("external");
+                const items = parent.getElementsByTagName("li");
+                for (let i = 0; i < items.length; i++) {
+                    const e = items[i];
+                    const item = {
+                        element: e,
+                        remove: e,
+                        data: {
+                            id: e.getAttribute("data-id"),
+                            name: e.innerText,
+                        },
+                    };
+                    DayPilot.Scheduler.makeDraggableAsRow(item);
+                }
+            },
+            registerDropTarget() {
+                // Scheduler에서 행을 드래그하여 외부 목록으로 이동
+                DayPilot.Scheduler.registerRowDropTarget({
+                    element: document.getElementById("external"),
+                    onDrop: args => {
+                        const parent = document.getElementById("external").querySelector("ul");
+                        const li = document.createElement("li");
+                        li.setAttribute("data-id", args.row.id);
+                        li.style.cursor = "move";
+                        li.innerText = args.row.name;
+                        parent.appendChild(li);
+
+                        app.makeDraggable();
+
+                        dp.rows.remove(args.row);
+                        document.getElementById("external").style.backgroundColor = "";
+                    },
+                    onDragOver: args => {
+                        document.getElementById("external").style.backgroundColor = "#f8f8f8";
+                    },
+                    onDragLeave: args => {
+                        document.getElementById("external").style.backgroundColor = "";
+                    }
+                });
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+</html>
