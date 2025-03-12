@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressive Row Rendering (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        #layout {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="layout">
+        <div id="dp"></div>
+    </div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: "2025-01-01",
+            days: 365,
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Month", format: "MMMM yyyy"},
+                {groupBy: "Cell", format: "d"}
+            ],
+            treeEnabled: true,
+            progressiveRowRendering: true,
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) {
+                    return;
+                }
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            height: 350
+        });
+
+        dp.init();
+        dp.scrollTo("2025-03-25");
+
+        const app = {
+            init() {
+                this.loadData();
+            },
+            loadData() {
+                // Generate and load resources dynamically
+                const resources = [];
+                for (let i = 0; i < 300; i++) {
+                    const r = {
+                        name: "Resource " + i,
+                        id: "R" + i,
+                        children: []
+                    };
+
+                    for (let x = 0; x < 3; x++) {
+                        const c = {
+                            name: "Resource " + i + "." + x,
+                            id: "R" + i + "." + x
+                        };
+                        r.children.push(c);
+                    }
+                    resources.push(r);
+                }
+
+                // Generate events dynamically
+                const events = [];
+                for (let i = 0; i < 300; i++) {
+                    events.push({
+                        start: "2025-03-25",
+                        end: "2025-03-25T12:00:00",
+                        id: DayPilot.guid(),
+                        resource: "R" + i,
+                        text: "Event"
+                    });
+                }
+
+                dp.update({resources, events});
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+</html>
