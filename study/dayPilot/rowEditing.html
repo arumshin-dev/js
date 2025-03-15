@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Row Editing (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        #dp {
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: DayPilot.Date.today().firstDayOfYear(),
+            days: DayPilot.Date.today().daysInYear(),
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Month", format: "MMMM yyyy"},
+                {groupBy: "Cell", format: "d"}
+            ],
+            rowHeaderColumns: [
+                {text: "Name"},
+                {text: "Capacity", display: "capacity"},
+            ],
+            treeEnabled: true,
+            rowClickHandling: "Edit",
+            onTimeRangeSelected: async (args) => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) {
+                    return;
+                }
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            onRowEdit: (args) => {
+                if (args.canceled) {
+                    console.log("User canceled.");
+                    return;
+                }
+            },
+            onRowEdited: (args) => {
+                dp.message("Row text changed to " + args.newText);
+            }
+        });
+
+        dp.init();
+
+        const app = {
+            loadEventsAndResources() {
+                const resources = [
+                    {name: "Room A", id: "A", capacity: 10},
+                    {name: "Room B", id: "B", capacity: 20},
+                    {name: "Room C", id: "C", capacity: 10},
+                    {name: "Room D", id: "D", capacity: 10},
+                    {name: "Room E", id: "E", capacity: 30},
+                    {name: "Room F", id: "F", capacity: 10},
+                    {name: "Room G", id: "G", capacity: 40},
+                    {name: "Room H", id: "H", capacity: 10},
+                    {name: "Room I", id: "I", capacity: 20},
+                    {name: "Room J", id: "J", capacity: 30},
+                    {name: "Room K", id: "K", capacity: 10},
+                ];
+
+                // generate and load events
+                const events = [];
+                const first = new DayPilot.Date(dp.startDate);
+                for (let i = 0; i < 15; i++) {
+                    let duration = Math.floor(Math.random() * 6) + 1; // 1 to 6
+                    let durationDays = Math.floor(Math.random() * 6); // 0 to 5
+                    let start = Math.floor(Math.random() * 6) + 2; // 2 to 7
+                    let res = Math.floor(Math.random() * resources.length); // Select a random resource
+
+                    events.push({
+                        start: first.addDays(start),
+                        end: first.addDays(start).addDays(durationDays).addHours(duration),
+                        id: DayPilot.guid(),
+                        resource: resources[res].id,
+                        text: "Event"
+                    });
+                }
+
+                dp.update({
+                    events,
+                    resources
+                });
+            },
+            init() {
+                app.loadEventsAndResources();
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+</html>
