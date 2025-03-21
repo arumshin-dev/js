@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Row Moving (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        #dp {
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: "2025-01-01",
+            days: 365,
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Month", format: "MMMM yyyy"},
+                {groupBy: "Cell", format: "d"}
+            ],
+            treeEnabled: true,
+            resources: [
+                {
+                    name: "Locations", id: "G1", expanded: true, children: [
+                        {name: "Room 1", id: "A"},
+                        {name: "Room 2", id: "B"},
+                        {name: "Room 3", id: "C"},
+                        {name: "Room 4", id: "D"}
+                    ]
+                },
+                {
+                    name: "People", id: "G2", expanded: false, children: [
+                        {name: "Person 1", id: "E"},
+                        {name: "Person 2", id: "F"},
+                        {name: "Person 3", id: "G"},
+                        {name: "Person 4", id: "H"}
+                    ]
+                },
+                {
+                    name: "Tools", id: "G3", expanded: false, children: [
+                        {name: "Tool 1", id: "I"},
+                        {name: "Tool 2", id: "J"},
+                        {name: "Tool 3", id: "K"},
+                        {name: "Tool 4", id: "L"}
+                    ]
+                },
+                {
+                    name: "Other Resources", id: "G4", expanded: true, children: [
+                        {name: "Resource 1", id: "R1"},
+                        {name: "Resource 2", id: "R2"},
+                        {name: "Resource 3", id: "R3"},
+                        {name: "Resource 4", id: "R4"}
+                    ]
+                },
+            ],
+            onTimeRangeSelected: async (args) => {
+                const {result} = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (!result) return;
+                const e = new DayPilot.Event({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: result
+                });
+                dp.events.add(e);
+                dp.message("Created");
+            },
+            rowMoveHandling: "Update",
+            onRowMove: (args) => {
+                console.log("source: " + args.source.id  + ", target: " + args.target.id + ", position: " + args.position);
+            },
+            onRowMoving: (args) => {
+                if (args.target.id === "B" && args.position === "child") {
+                    args.position = "forbidden";
+                }
+            },
+            height: 350
+        });
+
+        dp.init();
+        dp.scrollTo("2025-03-25");
+
+    </script>
+
+</body>
+</html>
