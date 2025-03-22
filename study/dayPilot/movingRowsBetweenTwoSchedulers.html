@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Moving Rows Between Two Schedulers</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #dp1, #dp2 {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dp1"></div>
+    <div id="dp2"></div>
+
+    <script>
+        const dp1 = new DayPilot.Scheduler("dp1", {
+            startDate: new DayPilot.Date("2025-03-01"),
+            days: new DayPilot.Date("2025-03-01").daysInMonth(),
+            scale: "Hour",
+            timeHeaders: [
+                {groupBy: "Day"},
+                {groupBy: "Hour"}
+            ],
+            treeEnabled: true,
+            rowHeaderWidth: 100,
+            resources: [
+                {name: "Room A", id: "A"},
+                {name: "Room B", id: "B"},
+                {name: "Room C", id: "C"},
+                {name: "Room D", id: "D"},
+                {name: "Room E", id: "E"},
+                {name: "Room F", id: "F"},
+            ],
+            onRowMoving: args => {
+                console.log("onRowMoving (dp1)", args);
+            },
+            onRowMove: args => {
+                console.log("onRowMove (dp1)", args);
+            },
+            rowMoveHandling: "Update"
+        });
+        dp1.init();
+
+        const dp2 = new DayPilot.Scheduler("dp2", {
+            startDate: new DayPilot.Date("2025-03-01"),
+            days: new DayPilot.Date("2025-03-01").daysInMonth(),
+            scale: "Hour",
+            timeHeaders: [
+                {groupBy: "Day"},
+                {groupBy: "Hour"}
+            ],
+            treeEnabled: true,
+            rowHeaderWidth: 100,
+            resources: [
+                {name: "Room 1", id: "R1"},
+                {name: "Room 2", id: "R2"},
+                {name: "Room 3", id: "R3"},
+                {name: "Room 4", id: "R4"},
+                {name: "Room 5", id: "R5"},
+                {name: "Room 6", id: "R6"},
+            ],
+            onRowMoving: args => {
+                console.log("onRowMoving (dp2)", args);
+            },
+            onRowMove: args => {
+                console.log("onRowMove (dp2)", args);
+            },
+            rowMoveHandling: "Update"
+        });
+        dp2.init();
+    </script>
+
+</body>
+</html>
