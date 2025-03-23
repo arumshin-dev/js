@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Row Selecting - DayPilot Scheduler</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #dp {
+            height: 300px;
+        }
+        .toolbar {
+            padding: 10px;
+            background-color: #f3f3f3;
+            border-bottom: 1px solid #ccc;
+        }
+        .toolbar button {
+            margin-right: 10px;
+            padding: 6px 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button id="add">Select Row B</button>
+        <button id="clear">Clear Selection</button>
+    </div>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: "2025-01-01",
+            days: 365,
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Month", format: "MMMM yyyy"},
+                {groupBy: "Cell", format: "d"}
+            ],
+            treeEnabled: true,
+            resources: [
+                {name: "Room A", id: "A"},
+                {name: "Room B", id: "B"},
+                {name: "Room C", id: "C"},
+                {name: "Room D", id: "D"},
+                {name: "Room E", id: "E"},
+                {name: "Room F", id: "F"},
+                {name: "Room G", id: "G"},
+                {name: "Room H", id: "H"},
+                {name: "Room I", id: "I"},
+                {name: "Room J", id: "J"},
+                {name: "Room K", id: "K"},
+            ],
+            onTimeRangeSelected: async (args) => {
+                const {result} = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (!result) return;
+                const e = new DayPilot.Event({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: result
+                });
+                dp.events.add(e);
+                dp.message("Created");
+            },
+            rowClickHandling: "Select",
+            onRowSelect: (args) => {
+                console.log("Row selected:", args.row.toJSON());
+            },
+            onRowSelected: (args) => {
+                const msg = "This row was " + (args.selected ? "" : "de") + "selected: " + args.row.name;
+                dp.message(msg);
+                console.log("Selected rows:", dp.rows.selection.get().length);
+            },
+            selectedRows: ["A"],
+            height: 300,
+        });
+
+        dp.init();
+        dp.scrollTo("2025-03-25");
+
+        const app = {
+            elements: {
+                add: document.querySelector('#add'),
+                clear: document.querySelector('#clear'),
+            },
+            init() {
+                this.addEventHandlers();
+                this.loadEventData();
+            },
+            addEventHandlers() {
+                this.elements.add.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    dp.rows.selection.add(dp.rows.find('B'));
+                });
+                this.elements.clear.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    dp.rows.selection.clear();
+                });
+            },
+            loadEventData() {
+                const events = [];
+                for (let i = 0; i < 15; i++) {
+                    const duration = Math.floor(Math.random() * 6) + 1;
+                    const durationDays = Math.floor(Math.random() * 6);
+                    const start = Math.floor(Math.random() * 6) + 2;
+                    events.push({
+                        start: new DayPilot.Date("2025-03-25T00:00:00").addDays(start),
+                        end: new DayPilot.Date("2025-03-25T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+                        id: DayPilot.guid(),
+                        resource: String.fromCharCode(65 + i),
+                        text: "Event"
+                    });
+                }
+                dp.update({events});
+            }
+        };
+        app.init();
+    </script>
+
+</body>
+</html>
