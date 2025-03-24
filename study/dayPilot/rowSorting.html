@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Row Header Columns with Sorting</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    #dp {
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="dp"></div>
+
+  <script>
+    const dp = new DayPilot.Scheduler("dp", {
+      startDate: new DayPilot.Date("2025-10-01"),
+      days: new DayPilot.Date("2025-10-01").daysInMonth(),
+      scale: "Day",
+      timeHeaders: [
+        { groupBy: "Month", format: "MMMM yyyy" },
+        { groupBy: "Day", format: "d" }
+      ],
+      rowHeaderColumns: [
+        { text: 'Name', display: "name", sort: "name" },
+        { text: 'Floor', display: "location", sort: "location" },
+        { text: 'Size', display: "size", sort: "size" }
+      ],
+      resources: [
+        {
+          id: "B", expanded: true, name: "Building B", children: [
+            { id: "101", name: "Room 101", location: "Floor 1", size: "2 beds" },
+            { id: "102", name: "Room 102", location: "Floor 1", size: "3 beds" },
+            { id: "103", name: "Room 103", location: "Floor 1", size: "1 bed" },
+            { id: "201", name: "Room 201", location: "Floor 2", size: "2 beds" }
+          ]
+        },
+        {
+          id: "A", expanded: true, name: "Building A", children: [
+            { id: "301", name: "Room 301", location: "Floor 1", size: "2 beds" },
+            { id: "302", name: "Room 302", location: "Floor 1", size: "3 beds" },
+            { id: "303", name: "Room 303", location: "Floor 1", size: "1 bed" },
+            { id: "401", name: "Room 401", location: "Floor 2", size: "2 beds" }
+          ]
+        }
+      ],
+      rowSortingMode: "All",  // 전체 행 그룹 정렬 허용
+      treeEnabled: true,
+      onTimeRangeSelected: async args => {
+        const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+        dp.clearSelection();
+        if (modal.canceled) return;
+
+        dp.events.add({
+          start: args.start,
+          end: args.end,
+          id: DayPilot.guid(),
+          resource: args.resource,
+          text: modal.result
+        });
+        dp.message("Created");
+      },
+      onRowSorted: args => {
+        console.log("onRowSorted", args.oldSortParam, dp.rows.sortParam);
+      },
+      height: 500
+    });
+
+    dp.init();
+
+    const app = {
+      init() {
+        this.loadEventData();
+      },
+      loadEventData() {
+        const events = [];
+        let start = new DayPilot.Date("2025-10-02T00:00:00");
+
+        for (let i = 1; i <= 5; i++) {
+          const duration = Math.floor(Math.random() * 6) + 1;
+          const end = start.addDays(duration);
+
+          events.push({
+            start: start,
+            end: end,
+            id: DayPilot.guid(),
+            resource: "101",
+            text: "Reservation #" + i
+          });
+
+          start = end.addDays(1);
+        }
+
+        dp.update({ events });
+      }
+    };
+
+    app.init();
+  </script>
+
+</body>
+</html>
