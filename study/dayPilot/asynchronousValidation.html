@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Asynchronous Validation - DayPilot Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    #dp {
+      height: 500px;
+    }
+    .toolbar {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="blockoncallback"> Block UI during Callback</label>
+  </div>
+
+  <div id="dp"></div>
+
+  <script>
+    const dp = new DayPilot.Scheduler("dp", {
+      startDate: "2025-01-01",
+      days: 365,
+      scale: "Day",
+      timeHeaders: [
+        {groupBy: "Month", format: "MMMM yyyy"},
+        {groupBy: "Cell", format: "d"}
+      ],
+      treeEnabled: true,
+      blockOnCallBack: false, // 기본적으로 false
+      height: 300,
+      resources: [
+        {
+          name: "Locations", id: "G1", expanded: true, children: [
+            {name: "Room 1", id: "A"},
+            {name: "Room 2", id: "B"},
+            {name: "Room 3", id: "C"},
+            {name: "Room 4", id: "D"}
+          ]
+        },
+        {
+          name: "People", id: "G2", expanded: true, children: [
+            {name: "Person 1", id: "E"},
+            {name: "Person 2", id: "F"},
+            {name: "Person 3", id: "G"},
+            {name: "Person 4", id: "H"}
+          ]
+        },
+        {
+          name: "Tools", id: "G3", expanded: true, children: [
+            {name: "Tool 1", id: "I"},
+            {name: "Tool 2", id: "J"},
+            {name: "Tool 3", id: "K"},
+            {name: "Tool 4", id: "L"}
+          ]
+        },
+      ],
+
+      onEventMove: async args => {
+        args.async = true;
+        dp.message("Validating move...");
+        // 가상의 비동기 검증 (실제로는 API 호출 등 가능)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 예시 조건: Tool로 이동은 금지
+        if (args.newResource.startsWith("I") || args.newResource.startsWith("J")) {
+          dp.message("Moving to a Tool is not allowed.");
+          args.preventDefault();
+        }
+
+        args.loaded();
+      },
+
+      onEventMoved: args => {
+        dp.message("Moved: " + args.e.text());
+      },
+
+      onEventResize: async args => {
+        args.async = true;
+        dp.message("Validating resize...");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 예시 조건: 길이 10일 초과 시 금지
+        const diff = DayPilot.DateUtil.daysDiff(args.newStart, args.newEnd);
+        if (diff > 10) {
+          dp.message("Event can't be longer than 10 days.");
+          args.preventDefault();
+        }
+
+        args.loaded();
+      },
+
+      onEventResized: args => {
+        dp.message("Resized: " + args.e.text());
+      },
+
+      onTimeRangeSelected: async args => {
+        const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+        dp.clearSelection();
+        if (modal.canceled) return;
+        dp.events.add({
+          start: args.start,
+          end: args.end,
+          id: DayPilot.guid(),
+          resource: args.resource,
+          text: modal.result
+        });
+        dp.message("Created");
+      }
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+      init() {
+        this.loadEventData();
+        this.addEventHandlers();
+      },
+
+      loadEventData() {
+        const events = [];
+
+        for (let i = 0; i < 6; i++) {
+          const start = new DayPilot.Date("2025-03-25T00:00:00").addDays(i * 2);
+          const end = start.addDays(3);
+          const resId = String.fromCharCode(65 + i);
+          events.push({
+            start,
+            end,
+            id: DayPilot.guid(),
+            resource: resId,
+            text: "Event " + (i + 1)
+          });
+        }
+
+        dp.update({ events });
+      },
+
+      addEventHandlers() {
+        document.querySelector("#blockoncallback").addEventListener("change", function () {
+          dp.blockOnCallBack = this.checked;
+        });
+      }
+    };
+
+    app.init();
+  </script>
+
+</body>
+</html>
