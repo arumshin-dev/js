@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Group Concurrent Events (DayPilot Scheduler)</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    #dp {
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="dp"></div>
+
+<script>
+  const dp = new DayPilot.Scheduler("dp", {
+    startDate: "2024-01-01",
+    days: 365,
+    scale: "Day",
+    timeHeaders: [
+      {groupBy: "Month", format: "MMMM yyyy"},
+      {groupBy: "Cell", format: "d"}
+    ],
+    treeEnabled: true,
+    groupConcurrentEvents: true,
+    groupConcurrentEventsLimit: 1,
+    sortDirections: ["asc"],
+    groupBubble: new DayPilot.Bubble({
+      onLoad: args => {
+        const count = args.source.events.length;
+        args.html = `Click to expand this group of ${count} events.`;
+      }
+    }),
+    resources: [
+      {name: "Room A", id: "A"}, {name: "Room B", id: "B"}, {name: "Room C", id: "C"},
+      {name: "Room D", id: "D"}, {name: "Room E", id: "E"}, {name: "Room F", id: "F"},
+      {name: "Room G", id: "G"}, {name: "Room H", id: "H"}, {name: "Room I", id: "I"},
+      {name: "Room J", id: "J"}, {name: "Room K", id: "K"}
+    ],
+    onBeforeRowHeaderRender: args => {
+      const hasExpanded = args.row.groups.expanded().length > 0;
+      const hasCollapsed = args.row.groups.collapsed().length > 0;
+
+      if (hasExpanded && hasCollapsed) {
+        args.row.areas = [
+          {
+            v: "Visible", right: 14, top: 0, height: 12, width: 12, style: "cursor:pointer",
+            image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAIAAABv85FHAAAAKXRFWHRDcmVhdGlvbiBUaW1lAHDhIDMwIEkgMjAwOSAwODo0NjozMSArMDEwMClDkt4AAAAHdElNRQfZAR4HLyUoFBT0AAAACXBIWXMAAA7CAAAOwgEVKEqAAAAABGdBTUEAALGPC/xhBQAAAFJJREFUeNpjrK6s5uTl/P75OybJ0NLW8h8bAIozgeRhgJGREc4GijMBtTNgA0BxFog+uA4IA2gmUJwFog/IgUhAGBB9KPYhA3T74Jog+hjx+A8A1KRQ+AN5vcwAAAAASUVORK5CYII=",
+            onClick: args => args.source.groups.expandAll()
+          },
+          {
+            v: "Visible", right: 0, top: 0, height: 12, width: 12, style: "cursor:pointer",
+            image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAIAAABv85FHAAAAKXRFWHRDcmVhdGlvbiBUaW1lAHDhIDMwIEkgMjAwOSAwODo0NjozMSArMDEwMClDkt4AAAAHdElNRQfZAR4HLxB+p9DXAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAABGdBTUEAALGPC/xhBQAAAENJREFUeNpjrK6s5uTl/P75OybJ0NLW8h8bAIozgeSxAaA4E1A7VjmgOAtEHyMjI7IE0EygOAtEH5CDqY9c+xjx+A8ANndK9WaZlP4AAAAASUVORK5CYII=",
+            onClick: args => args.source.groups.collapseAll()
+          }
+        ];
+      } else if (hasCollapsed) {
+        args.row.areas = [{
+          v: "Visible", right: 0, top: 0, height: 12, width: 12, style: "cursor:pointer",
+          image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAIAAABv85FHAAAAKXRFWHRDcmVhdGlvbiBUaW1lAHDhIDMwIEkgMjAwOSAwODo0NjozMSArMDEwMClDkt4AAAAHdElNRQfZAR4HLyUoFBT0AAAACXBIWXMAAA7CAAAOwgEVKEqAAAAABGdBTUEAALGPC/xhBQAAAFJJREFUeNpjrK6s5uTl/P75OybJ0NLW8h8bAIozgeRhgJGREc4GijMBtTNgA0BxFog+uA4IA2gmUJwFog/IgUhAGBB9KPYhA3T74Jog+hjx+A8A1KRQ+AN5vcwAAAAASUVORK5CYII=",
+          onClick: args => args.source.groups.expandAll()
+        }];
+      } else if (hasExpanded) {
+        args.row.areas = [{
+          v: "Visible", right: 0, top: 0, height: 12, width: 12, style: "cursor:pointer",
+          image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAIAAABv85FHAAAAKXRFWHRDcmVhdGlvbiBUaW1lAHDhIDMwIEkgMjAwOSAwODo0NjozMSArMDEwMClDkt4AAAAHdElNRQfZAR4HLxB+p9DXAAAACXBIWXMAAA7CAAAOwgEVKEqAAAAABGdBTUEAALGPC/xhBQAAAENJREFUeNpjrK6s5uTl/P75OybJ0NLW8h8bAIozgeSxAaA4E1A7VjmgOAtEHyMjI7IE0EygOAtEH5CDqY9c+xjx+A8ANndK9WaZlP4AAAAASUVORK5CYII=",
+          onClick: args => args.source.groups.collapseAll()
+        }];
+      }
+    },
+    onTimeRangeSelected: async args => {
+      const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+      dp.clearSelection();
+      if (modal.canceled) return;
+      dp.events.add({
+        start: args.start,
+        end: args.end,
+        id: DayPilot.guid(),
+        resource: args.resource,
+        text: modal.result
+      });
+      dp.message("Created");
+    }
+  });
+
+  dp.init();
+  dp.scrollTo("2024-11-25");
+
+  const app = {
+    init() {
+      this.loadEventData();
+    },
+    loadEventData() {
+      const events = [
+        {start: "2024-11-30T00:00:00", end: "2024-12-01T18:00:00", id: "1", resource: "B", text: "Event"},
+        {start: "2024-11-28T00:00:00", end: "2024-11-30T16:00:00", id: "2", resource: "C", text: "Event"},
+        {start: "2024-12-01T00:00:00", end: "2024-12-02T15:00:00", id: "3", resource: "C", text: "Event"},
+        {start: "2024-11-30T00:00:00", end: "2024-12-03T13:00:00", id: "4", resource: "A", text: "Event"},
+        {start: "2024-11-29T00:00:00", end: "2024-12-01T17:00:00", id: "5", resource: "D", text: "Event"},
+        {start: "2024-11-29T00:00:00", end: "2024-11-30T13:00:00", id: "6", resource: "E", text: "Event"},
+        {start: "2024-11-30T00:00:00", end: "2024-11-30T14:00:00", id: "7", resource: "D", text: "Event"},
+        {start: "2024-12-01T00:00:00", end: "2024-12-06T15:00:00", id: "8", resource: "C", text: "Event"},
+        {start: "2024-12-03T00:00:00", end: "2024-12-05T00:00:00", id: "9", resource: "G", text: "Sort 1", sort: [1]},
+        {start: "2024-12-01T00:00:00", end: "2024-12-06T00:00:00", id: "10", resource: "G", text: "Sort 3", sort: [3]},
+        {start: "2024-12-04T00:00:00", end: "2024-12-08T00:00:00", id: "11", resource: "G", text: "Sort 4", sort: [4]},
+        {start: "2024-12-07T00:00:00", end: "2024-12-08T00:00:00", id: "12", resource: "G", text: "Sort 2", sort: [2]},
+      ];
+
+      dp.update({events});
+    }
+  };
+
+  app.init();
+</script>
+
+</body>
+</html>
