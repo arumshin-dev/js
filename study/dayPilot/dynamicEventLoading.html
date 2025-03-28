@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic Loading - DayPilot Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    #dp {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="dp"></div>
+
+<script>
+  const dp = new DayPilot.Scheduler("dp", {
+    startDate: "2025-01-01",
+    days: 365,
+    scale: "Day",
+    cellGroupBy: "Month",
+    treeEnabled: true,
+    dynamicLoading: true,
+    resources: [
+      {name: "Room A", id: "A"},
+      {name: "Room B", id: "B"},
+      {name: "Room C", id: "C"},
+      {name: "Room D", id: "D"},
+      {name: "Room E", id: "E"},
+      {name: "Room F", id: "F"},
+      {name: "Room G", id: "G"},
+      {name: "Room H", id: "H"},
+      {name: "Room I", id: "I"}
+    ],
+    onScroll: async (args) => {
+      args.async = true;
+
+      // Simulate loading from server with timeout
+      setTimeout(() => {
+        const loadedEvents = app.getEventData(args.viewport.start, args.viewport.end);
+        args.events = loadedEvents;
+        args.loaded();
+      }, 100);
+    }
+  });
+
+  dp.init();
+
+  const app = {
+    getEventData(from, to) {
+      const events = [];
+
+      for (let i = 0; i < 10; i++) {
+        const duration = Math.floor(Math.random() * 6) + 1; // 1~6일
+        const startOffset = Math.floor(Math.random() * 6) + 1;
+
+        const start = from.addDays(startOffset);
+        const end = start.addDays(duration);
+
+        events.push({
+          start: start,
+          end: end,
+          id: DayPilot.guid(),
+          resource: String.fromCharCode(65 + i), // A ~ J
+          text: "Event"
+        });
+      }
+
+      return events;
+    }
+  };
+</script>
+
+</body>
+</html>
