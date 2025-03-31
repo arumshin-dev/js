@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Event Active Areas - DayPilot Scheduler</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    #dp {
+      height: 600px;
+      width: 100%;
+    }
+    .icon {
+      cursor: pointer;
+    }
+    .status {
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+<div id="dp"></div>
+
+<script>
+  const dp = new DayPilot.Scheduler("dp", {
+    eventHeight: 40,
+    startDate: "2025-01-01",
+    days: 365,
+    scale: "Day",
+    rowMarginBottom: 2,
+    rowMarginTop: 2,
+    timeHeaders: [
+      {groupBy: "Month"},
+      {groupBy: "Day", format: "d"},
+    ],
+    contextMenu: new DayPilot.Menu({
+      items: [
+        { text: "Open", onClick: args => DayPilot.Modal.alert("Not implemented") }
+      ]
+    }),
+    treeEnabled: true,
+    resources: [
+      {name: "Room A", id: "A"},
+      {name: "Room B", id: "B"},
+      {name: "Room C", id: "C"},
+      {name: "Room D", id: "D"},
+      {name: "Room E", id: "E"},
+      {name: "Room F", id: "F"},
+      {name: "Room G", id: "G"},
+      {name: "Room H", id: "H"},
+      {name: "Room I", id: "I"},
+    ],
+    onTimeRangeSelected: args => {
+      const name = prompt("New event name:", "Event");
+      dp.clearSelection();
+      if (!name) return;
+      dp.events.add(new DayPilot.Event({
+        start: args.start,
+        end: args.end,
+        id: DayPilot.guid(),
+        resource: args.resource,
+        text: name
+      }));
+      dp.message("Created");
+    },
+    height: 400
+  });
+
+  dp.init();
+
+  const app = {
+    init() {
+      this.loadEventData();
+    },
+    loadEventData() {
+      const events = [
+        {
+          id: 1,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-10T00:00:00",
+          text: "Context menu",
+          resource: "A",
+          areas: [
+            {
+              right: 7,
+              top: 12,
+              height: 16,
+              width: 16,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#minichevron-down-4",
+              cssClass: "icon",
+              action: "ContextMenu"
+            }
+          ]
+        },
+        {
+          id: 2,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-10T00:00:00",
+          text: "Status",
+          resource: "B",
+          areas: [
+            {
+              right: 7,
+              top: 12,
+              height: 16,
+              width: 16,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#padlock",
+              cssClass: "status"
+            }
+          ]
+        },
+        {
+          id: 3,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-08T00:00:00",
+          text: "Resize",
+          resource: "C",
+          resizeDisabled: true,
+          areas: [
+            {
+              right: 4,
+              top: 8,
+              height: 24,
+              width: 12,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#resize-right",
+              cssClass: "icon",
+              action: "ResizeEnd"
+            }
+          ]
+        },
+        {
+          id: 4,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-08T00:00:00",
+          text: "",
+          resource: "D",
+          moveDisabled: true,
+          areas: [
+            {
+              left: 4,
+              top: 8,
+              height: 24,
+              width: 12,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#resize-left",
+              cssClass: "icon",
+              action: "ResizeStart"
+            },
+            {
+              left: 20,
+              top: 12,
+              height: 24,
+              right: 0,
+              text: "Resize start"
+            }
+          ]
+        },
+        {
+          id: 5,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-08T00:00:00",
+          text: "",
+          resource: "E",
+          moveDisabled: true,
+          areas: [
+            {
+              left: 4,
+              top: 8,
+              height: 24,
+              width: 12,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#move-vertical",
+              cssClass: "icon",
+              action: "Move"
+            },
+            {
+              left: 20,
+              top: 12,
+              height: 24,
+              right: 0,
+              text: "Move"
+            }
+          ]
+        },
+        {
+          id: 6,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-10T00:00:00",
+          text: "Delete",
+          resource: "F",
+          areas: [
+            {
+              right: 5,
+              top: 12,
+              height: 16,
+              width: 16,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#x-circle",
+              cssClass: "icon",
+              onClick: function(args) {
+                dp.events.remove(args.source);
+              }
+            }
+          ]
+        },
+        {
+          id: 7,
+          start: "2025-01-02T00:00:00",
+          end: "2025-01-10T00:00:00",
+          text: "Details",
+          resource: "G",
+          areas: [
+            {
+              right: 5,
+              top: 12,
+              height: 16,
+              width: 16,
+              symbol: "https://cdn.daypilot.org/2024-03-27/icons/daypilot.svg#bubble",
+              cssClass: "icon",
+              onClick: function(args) {
+                DayPilot.Modal.alert("Event details");
+              }
+            }
+          ]
+        }
+      ];
+
+      dp.update({events});
+    }
+  };
+
+  app.init();
+</script>
+
+</body>
+</html>
