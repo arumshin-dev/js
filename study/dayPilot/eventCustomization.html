@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DayPilot Scheduler - Event Customization</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        #dp {
+            width: 100%;
+            height: 550px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        // appearance
+        cellWidth: 80,
+        eventHeight: 40,
+
+        // timeline
+        startDate: new DayPilot.Date("2025-03-01"),
+        days: new DayPilot.Date("2025-03-01").daysInMonth(),
+        scale: "Day",
+        timeHeaders: [
+            {groupBy: "Month"},
+            {groupBy: "Day", format: "d"}
+        ],
+
+        // resource rows
+        resources: [
+            {name: "Room A", id: "A"},
+            {name: "Room B", id: "B"},
+            {name: "Room C", id: "C"}
+        ],
+
+        // customize individual event rendering
+        onBeforeEventRender: args => {
+            if (args.e.type === "disabled") {
+                args.e.barColor = "#9a0";
+                args.e.barBackColor = "#ac0";
+                args.e.moveDisabled = true;
+                args.e.bubbleHtml = "Moving of this event is disabled.";
+                args.e.areas = [
+                    {
+                        html: "Disabled",
+                        right: 2,
+                        bottom: 2,
+                        fontColor: "#555",
+                        style: "font-size: 11px;"
+                    }
+                ];
+            }
+        },
+
+        // new event creation
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            dp.message("Created");
+        }
+    });
+
+    dp.init();
+
+    // load events into scheduler
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [
+                {
+                    start: "2025-03-02T12:00:00",
+                    end: "2025-03-05T12:00:00",
+                    id: 1,
+                    resource: "A",
+                    text: "Event 1",
+                    type: "disabled"
+                },
+                {
+                    start: "2025-03-01T00:00:00",
+                    end: "2025-03-06T00:00:00",
+                    id: 2,
+                    resource: "B",
+                    text: "Event 1"
+                }
+            ];
+
+            dp.update({events});
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
