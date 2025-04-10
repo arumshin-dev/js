@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Event Filtering - DayPilot Scheduler</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        #toolbar {
+            padding: 10px;
+            background: #f3f3f3;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #filter {
+            padding: 6px;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        #clear {
+            padding: 6px 12px;
+            margin-left: 6px;
+        }
+
+        #dp {
+            width: 100%;
+            height: 550px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="toolbar">
+    <label for="filter">Filter:</label>
+    <input type="text" id="filter" placeholder="Search event name..." />
+    <button id="clear">Clear</button>
+</div>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Cell", format: "d" }
+        ],
+        treeEnabled: true,
+        onTimeRangeSelected: async (args) => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+
+            dp.message("Created");
+        },
+        onEventFilter: (args) => {
+            const keyword = args.filter?.toUpperCase();
+            const text = args.e.text().toUpperCase();
+            args.visible = !keyword || text.includes(keyword);
+        },
+        height: 400
+    });
+
+    dp.init();
+    dp.scrollTo("2025-10-25");
+
+    const app = {
+        elements: {
+            filter: document.getElementById("filter"),
+            clear: document.getElementById("clear")
+        },
+        loadData() {
+            const resources = [
+                { name: "Room A", id: "A" },
+                { name: "Room B", id: "B" },
+                { name: "Room C", id: "C" },
+                { name: "Room D", id: "D" },
+                { name: "Room E", id: "E" },
+                { name: "Room F", id: "F" },
+                { name: "Room G", id: "G" },
+                { name: "Room H", id: "H" },
+                { name: "Room I", id: "I" },
+                { name: "Room J", id: "J" },
+                { name: "Room K", id: "K" }
+            ];
+
+            const events = [];
+            for (let i = 0; i < 15; i++) {
+                const duration = Math.floor(Math.random() * 6) + 1;
+                const durationDays = Math.floor(Math.random() * 6 + 2);
+                const startOffset = Math.floor(Math.random() * 6) + 2;
+
+                events.push({
+                    start: new DayPilot.Date("2025-10-25T00:00:00").addDays(startOffset),
+                    end: new DayPilot.Date("2025-10-25T12:00:00")
+                          .addDays(startOffset)
+                          .addDays(durationDays)
+                          .addHours(duration),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),
+                    text: `Event ${i + 1}`
+                });
+            }
+
+            dp.update({ resources, events });
+        },
+        init() {
+            this.elements.filter.addEventListener("keyup", function () {
+                const query = this.value;
+                dp.events.filter(query);
+            });
+
+            this.elements.clear.addEventListener("click", function (e) {
+                e.preventDefault();
+                app.elements.filter.value = "";
+                dp.events.filter(null);
+            });
+
+            this.loadData();
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
