@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Event Links - DayPilot Scheduler</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+
+        #dp {
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="dp"></div>
+
+    <script>
+        const dp = new DayPilot.Scheduler("dp", {
+            startDate: "2025-01-01",
+            days: 365,
+            scale: "Day",
+            timeHeaders: [
+                {groupBy: "Month", format: "MMMM yyyy"},
+                {groupBy: "Cell", format: "d"}
+            ],
+            eventHeight: 40,
+            treeEnabled: true,
+            resources: [
+                {name: "Room A", id: "A"},
+                {name: "Room B", id: "B"},
+                {name: "Room C", id: "C"},
+                {name: "Room D", id: "D"},
+                {name: "Room E", id: "E"},
+                {name: "Room F", id: "F"},
+                {name: "Room G", id: "G"},
+                {name: "Room H", id: "H"},
+                {name: "Room I", id: "I"},
+                {name: "Room J", id: "J"},
+                {name: "Room K", id: "K"}
+            ],
+            onTimeRangeSelected: async args => {
+                const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+                dp.clearSelection();
+                if (modal.canceled) return;
+                dp.events.add({
+                    start: args.start,
+                    end: args.end,
+                    id: DayPilot.guid(),
+                    resource: args.resource,
+                    text: modal.result
+                });
+                dp.message("Created");
+            },
+            linkBottomMargin: 20,
+            linkShape: "Curved",
+            linkWidth: "Auto",
+            contextMenuLink: new DayPilot.Menu({
+                items: [
+                    {
+                        text: "Delete", onClick: args => dp.links.remove(args.source)
+                    }
+                ]
+            }),
+            linkBubble: new DayPilot.Bubble({
+                onLoad: args => {
+                    if (!args.html) {
+                        args.html = "Default link bubble text";
+                    }
+                }
+            }),
+            onLinkClick: args => {
+                console.log("Link clicked:", args.link);
+            },
+            onBeforeEventRender: args => {
+                if (args.data.start < new DayPilot.Date("2025-04-06")) {
+                    args.data.linkCreateDisabled = true;
+                }
+            },
+            height: 350
+        });
+
+        dp.init();
+        dp.scrollTo("2025-03-25");
+
+        const app = {
+            init() {
+                this.loadData();
+            },
+            loadData() {
+                const events = [];
+                const links = [];
+
+                function addEvent(id, text, resource, start, end) {
+                    events.push({id, text, resource, start, end});
+                }
+
+                function addLink(from, to, type = "FinishToStart", color, style, text) {
+                    const link = {from, to, type};
+                    if (color) link.color = color;
+                    if (style) link.style = style;
+                    if (text) link.text = text;
+                    links.push(link);
+                }
+
+                const ids = {};
+
+                function makeEvent(key, resource, start, end, text) {
+                    const id = DayPilot.guid();
+                    addEvent(id, text, resource, start, end);
+                    ids[key] = id;
+                }
+
+                // Sample events and links
+                makeEvent("main1", "A", "2025-03-30", "2025-04-02", "Main 1");
+                makeEvent("linked1", "B", "2025-04-02", "2025-04-05", "Linked 1");
+                addLink(ids.main1, ids.linked1, "FinishToStart", "red", "solid", "Bubble text");
+
+                makeEvent("main2", "B", "2025-04-07", "2025-04-09", "Main 2");
+                makeEvent("linked2", "A", "2025-04-09", "2025-04-11", "Linked 2");
+                addLink(ids.main2, ids.linked2);
+
+                makeEvent("main3", "A", "2025-04-16", "2025-04-19", "Main 3");
+                makeEvent("linked3", "A", "2025-04-19", "2025-04-22", "Linked 3");
+                addLink(ids.main3, ids.linked3, "FinishToStart", "black");
+
+                makeEvent("main4", "C", "2025-03-29", "2025-04-01", "Main 4");
+                makeEvent("linked4", "D", "2025-04-03", "2025-04-05", "Linked 4");
+                addLink(ids.main4, ids.linked4, "FinishToStart", "red", "solid", "Link text");
+
+                makeEvent("main5", "D", "2025-04-07", "2025-04-09", "Main 5");
+                makeEvent("linked5", "C", "2025-04-10", "2025-04-14", "Linked 5");
+                addLink(ids.main5, ids.linked5, "FinishToStart", "green", "dashed");
+
+                makeEvent("main6", "C", "2025-04-16", "2025-04-18", "Main 6");
+                makeEvent("linked6", "C", "2025-04-19", "2025-04-22", "Linked 6");
+                addLink(ids.main6, ids.linked6);
+
+                makeEvent("main7", "E", "2025-03-30", "2025-04-02", "Main 7");
+                makeEvent("linked7", "G", "2025-04-01", "2025-04-05", "Linked 7");
+                addLink(ids.main7, ids.linked7, "FinishToStart", "#606060", "dotted");
+
+                makeEvent("main8", "G", "2025-04-07", "2025-04-11", "Main 8");
+                makeEvent("linked8", "E", "2025-04-10", "2025-04-14", "Linked 8");
+                addLink(ids.main8, ids.linked8, "FinishToStart", "#f1c232");
+
+                makeEvent("main10", "F", "2025-04-16", "2025-04-20", "Main 10");
+                makeEvent("linked10", "G", "2025-04-16", "2025-04-20", "Linked 10");
+                addLink(ids.main10, ids.linked10, "FinishToFinish");
+
+                dp.update({events, links});
+            }
+        };
+
+        app.init();
+    </script>
+
+</body>
+
+</html>
