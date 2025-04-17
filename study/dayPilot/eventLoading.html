@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Loading - DayPilot Scheduler</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+
+        #dp {
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Cell", format: "d" }
+        ]
+    });
+
+    dp.init();
+
+    // 리소스 파일과 이벤트 파일을 서버에서 불러오기
+    // 실제 프로젝트에서는 아래 경로를 서버 API나 JSON 파일 경로로 바꿔주세요.
+    dp.rows.load("eventloadingresources.txt");
+    dp.events.load("eventloadingevents.txt");
+</script>
+
+</body>
+</html>
