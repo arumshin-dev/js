@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Moving Over Non-Business Hours</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+            height: 100%;
+        }
+        #controls {
+            padding: 10px;
+        }
+        #dp {
+            height: calc(100vh - 60px);
+        }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <strong>Weekends:</strong>
+    <label><input type="radio" name="nb" value="true" checked> Show</label>
+    <label><input type="radio" name="nb" value="false"> Hide</label>
+    <label><input type="checkbox" name="pattern"> Custom non-business pattern (We, Fr, Su)</label>
+</div>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Cell", format: "d" }
+        ],
+        treeEnabled: true,
+        showNonBusiness: true,
+        eventMoveSkipNonBusiness: true,
+        resources: [
+            {
+                name: "Locations", id: "G1", expanded: true, children: [
+                    { name: "Room 1", id: "A" },
+                    { name: "Room 2", id: "B" },
+                    { name: "Room 3", id: "C" },
+                    { name: "Room 4", id: "D" }
+                ]
+            },
+            {
+                name: "People", id: "G2", expanded: true, children: [
+                    { name: "Person 1", id: "E" },
+                    { name: "Person 2", id: "F" },
+                    { name: "Person 3", id: "G" },
+                    { name: "Person 4", id: "H" }
+                ]
+            },
+            {
+                name: "Tools", id: "G3", expanded: true, children: [
+                    { name: "Tool 1", id: "I" },
+                    { name: "Tool 2", id: "J" },
+                    { name: "Tool 3", id: "K" },
+                    { name: "Tool 4", id: "L" }
+                ]
+            }
+        ],
+        onBeforeEventRender: (args) => {
+            args.data.bubbleHtml = `<b>${args.e.text}</b><br>Start: ${args.e.start}<br>End: ${args.e.end}`;
+            if (args.data.text.includes("Event 3")) {
+                args.data.moveSkipNonBusinessDisabled = true;
+                args.data.text += " (non-business skipping disabled)";
+            }
+        },
+        onBeforeCellRender: (args) => {
+            if (dp.clientState.customPattern) {
+                const dow = args.cell.start.getDayOfWeek();
+                args.cell.business = [1, 2, 4, 6].includes(dow); // Only Mon, Tue, Thu, Sat are business
+            }
+        },
+        onTimeRangeSelected: async (args) => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            dp.message("Created");
+        },
+        height: 350
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        init() {
+            this.addEventHandlers();
+            this.loadEventData();
+        },
+        addEventHandlers() {
+            document.querySelectorAll("input[name='nb']").forEach(input => {
+                input.addEventListener("change", () => {
+                    const val = document.querySelector("input[name='nb']:checked").value === "true";
+                    const scroll = dp.getViewPort().start;
+                    dp.showNonBusiness = val;
+                    dp.update();
+                    dp.scrollTo(scroll);
+                });
+            });
+
+            document.querySelector("input[name='pattern']").addEventListener("change", () => {
+                dp.clientState.customPattern = document.querySelector("input[name='pattern']").checked;
+                dp.update();
+            });
+        },
+        loadEventData() {
+            const events = [];
+            for (let i = 0; i < 12; i++) {
+                const startOffset = Math.floor(Math.random() * 6) + 2;
+                const durationDays = Math.floor(Math.random() * 5) + 1;
+                const durationHours = Math.floor(Math.random() * 6) + 1;
+                const event = {
+                    start: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset),
+                    end: new DayPilot.Date("2025-03-25T12:00:00").addDays(startOffset).addDays(durationDays).addHours(durationHours),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),
+                    text: "Event " + (i + 1)
+                };
+                events.push(event);
+            }
+            dp.update({ events });
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
