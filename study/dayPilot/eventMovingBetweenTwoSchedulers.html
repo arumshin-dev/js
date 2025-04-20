@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Moving between Two Schedulers</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
+        #dp1, #dp2 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="dp1"></div>
+<div id="dp2"></div>
+
+<script>
+    const dp1 = new DayPilot.Scheduler("dp1", {
+        cellWidth: 40,
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        rowMarginBottom: 5,
+        rowHeaderWidth: 200,
+        timeHeaders: [
+            { groupBy: "Month" },
+            { groupBy: "Day", format: "d" }
+        ],
+        treeEnabled: true,
+        dragOutAllowed: true,
+        allowEventOverlap: false,
+        resources: getResources(),
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp1.clearSelection();
+            if (modal.canceled || !modal.result) return;
+            dp1.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+        },
+        onEventMove: args => app.handleEventMove(dp1, args),
+        onEventMoving: args => {
+            args.left.enabled = true;
+            args.left.html = args.start.toString("MMM d");
+        },
+        height: 200
+    });
+
+    const dp2 = new DayPilot.Scheduler("dp2", {
+        cellWidth: 40,
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        rowHeaderWidth: 200,
+        treeEnabled: true,
+        dragOutAllowed: true,
+        resources: getResources(),
+        onEventMove: args => app.handleEventMove(dp2, args),
+        onEventMoving: args => {
+            args.left.enabled = true;
+            args.left.html = args.start.toString("MMM d");
+        },
+        height: 200
+    });
+
+    function getResources() {
+        return [
+            { name: "Room A", id: "A", children: [{ name: "Part 1", id: "A.1" }, { name: "Part 2", id: "A.2" }] },
+            { name: "Room B", id: "B" },
+            { name: "Room C", id: "C" },
+            { name: "Room D", id: "D" },
+            { name: "Room E", id: "E" },
+            { name: "Room F", id: "F" },
+            { name: "Room G", id: "G" },
+            { name: "Room H", id: "H" },
+            { name: "Room I", id: "I" },
+            { name: "Room J", id: "J", children: [{ name: "Part 1", id: "J.1" }, { name: "Part 2", id: "J.2" }] }
+        ];
+    }
+
+    const app = {
+        init() {
+            dp1.init();
+            dp2.init();
+            this.syncScroll();
+            this.loadData();
+        },
+        syncScroll() {
+            dp1.nav.scroll.addEventListener("scroll", () => {
+                dp2.nav.scroll.scrollLeft = dp1.nav.scroll.scrollLeft;
+            });
+            dp2.nav.scroll.addEventListener("scroll", () => {
+                dp1.nav.scroll.scrollLeft = dp2.nav.scroll.scrollLeft;
+            });
+        },
+        handleEventMove(target, args) {
+            const source = args.e.calendar;
+            if (source !== target) {
+                source.events.remove(args.e);
+            }
+        },
+        loadData() {
+            const events1 = [];
+            for (let i = 0; i < 10; i++) {
+                const start = new DayPilot.Date("2025-03-25T00:00:00").addDays(i);
+                const end = start.addDays(3);
+                events1.push({
+                    start: start,
+                    end: end,
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + (i % 10)),
+                    text: "Event " + (i + 1)
+                });
+            }
+
+            const events2 = [{
+                start: "2025-03-20",
+                end: "2025-03-22",
+                id: DayPilot.guid(),
+                resource: "A",
+                text: "Event 21"
+            }];
+
+            dp1.update({ events: events1 });
+            dp2.update({ events: events2 });
+            dp1.scrollTo("2025-03-15");
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
