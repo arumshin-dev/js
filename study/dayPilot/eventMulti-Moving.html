@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Multi-Moving</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #dp {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="padding-left:20px;">Event Multi-Moving (JavaScript Scheduler)</h2>
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Cell", format: "d" }
+        ],
+        eventClickHandling: "Select",
+        treeEnabled: true,
+        allowEventOverlap: false,
+        allowMultiMove: true,
+        multiMoveVerticalMode: "All", // 모두 동시에 이동
+        onEventMoved: args => {
+            const movedIds = args.multimove.map(item => item.event.id());
+            dp.message("Moved: " + movedIds.join(", "));
+        },
+        onEventMoving: args => {
+            if (args.overlapping) {
+                args.right.enabled = true;
+                args.right.html = "⚠️ Overlap!";
+            }
+        },
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+        },
+        resources: [
+            { name: "Room A", id: "A" },
+            { name: "Room B", id: "B" },
+            { name: "Room C", id: "C" },
+            { name: "Room D", id: "D" },
+            { name: "Room E", id: "E" },
+            { name: "Room F", id: "F" },
+            { name: "Room G", id: "G" },
+            { name: "Room H", id: "H" },
+            { name: "Room I", id: "I" },
+            { name: "Room J", id: "J" }
+        ],
+        height: 400
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            for (let i = 0; i < 10; i++) {
+                const startOffset = 2 + i;
+                const durationDays = 2 + (i % 3);
+                const isDisabled = i === 3;
+
+                events.push({
+                    start: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset),
+                    end: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset + durationDays),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),
+                    text: "Event " + (i + 1) + (isDisabled ? " (disabled)" : ""),
+                    moveDisabled: isDisabled
+                });
+            }
+
+            dp.update({ events });
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
