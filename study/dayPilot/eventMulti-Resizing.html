@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Multi-Resizing (DayPilot Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        #dp {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="padding-left:20px;">Event Multi-Resizing (JavaScript Scheduler)</h2>
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: new DayPilot.Date("2025-03-01"),
+        days: 31,
+        scale: "Day",
+        cellDuration: 1440,
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Day", format: "d" }
+        ],
+        eventClickHandling: "Select",
+        treeEnabled: true,
+        rowHeaderWidth: 200,
+        allowEventOverlap: false,
+        allowMultiResize: true,
+
+        onEventResizing: args => {
+            // 특정 이벤트를 리사이징에서 제외
+            const blockResize = args.multiresize.find(info => info.event.data.text === "Event 2");
+            if (blockResize) {
+                blockResize.start = blockResize.event.start();
+                blockResize.end = blockResize.event.end();
+            }
+        },
+
+        onEventResized: args => {
+            const resizedIds = args.multiresize.map(info => info.event.id());
+            dp.message("Resized: " + resizedIds.join(", "));
+        },
+
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+        },
+
+        resources: [
+            { name: "Room A", id: "A" },
+            { name: "Room B", id: "B" },
+            { name: "Room C", id: "C" },
+            { name: "Room D", id: "D" },
+            { name: "Room E", id: "E" },
+            { name: "Room F", id: "F" },
+            { name: "Room G", id: "G" },
+            { name: "Room H", id: "H" },
+            { name: "Room I", id: "I" },
+            { name: "Room J", id: "J" }
+        ],
+        height: 400
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-01");
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            for (let i = 0; i < 10; i++) {
+                const startOffset = 5 + i;
+                const durationDays = 2 + (i % 3);
+
+                events.push({
+                    start: new DayPilot.Date("2025-03-01T00:00:00").addDays(startOffset),
+                    end: new DayPilot.Date("2025-03-01T00:00:00").addDays(startOffset + durationDays),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),
+                    text: `Event ${i + 1}`
+                });
+            }
+
+            dp.update({ events });
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
