@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Multi-Selecting</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #dp {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+        #msg {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Event Multi-Selecting (JavaScript Scheduler)</h1>
+
+<div class="controls">
+    <label>Select mode: 
+        <select id="mode">
+            <option value="Free">Free</option>
+            <option value="Row">Row</option>
+            <option value="Column">Column</option>
+        </select>
+    </label>
+    <label style="margin-left:20px;">
+        <input type="checkbox" id="shift"> Switch Shift key behavior
+    </label>
+</div>
+
+<div id="dp"></div>
+
+<div id="msg">(message will appear here)</div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            {groupBy: "Month", format: "MMMM yyyy"},
+            {groupBy: "Cell", format: "d"}
+        ],
+        treeEnabled: true,
+        resources: Array.from({length: 11}, (_, i) => ({
+            name: `Room ${String.fromCharCode(65 + i)}`,
+            id: String.fromCharCode(65 + i)
+        })),
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            if (modal.canceled) {
+                return;
+            }
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            dp.message("Created");
+        },
+        rectangleSelectMode: "Free",
+        rectangleSelectHandling: "EventSelect",
+        eventClickHandling: "Select",
+        onRectangleSelecting: args => {
+            const msg = args.events.map(item => item.text()).join(" ");
+            app.elements.msg.innerText = msg;
+        },
+        onRectangleSelect: args => {
+            console.log("Selected: " + args.events.map(item => item.text()));
+        },
+        onRectangleSelected: args => {
+            app.elements.msg.innerText = "(selection complete)";
+        },
+        onGridMouseDown: args => {
+            if (app.switchShift) {
+                args.action = args.shift ? "TimeRangeSelect" : "RectangleSelect";
+            }
+        },
+        height: 280
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        elements: {
+            mode: document.querySelector("#mode"),
+            shift: document.querySelector("#shift"),
+            msg: document.querySelector("#msg")
+        },
+        switchShift: false,
+        init() {
+            this.addEventHandlers();
+            this.loadEventData();
+        },
+        addEventHandlers() {
+            app.elements.mode.addEventListener("change", function () {
+                dp.rectangleSelectMode = app.elements.mode.value;
+            });
+
+            app.elements.shift.addEventListener("change", function () {
+                app.switchShift = app.elements.shift.checked;
+                console.log("switchShift: " + app.switchShift);
+            });
+        },
+        loadEventData() {
+            const events = [];
+            for (let i = 0; i < 15; i++) {
+                const duration = Math.floor(Math.random() * 6) + 1;
+                const durationDays = Math.floor(Math.random() * 6);
+                const start = Math.floor(Math.random() * 6) + 2;
+                const event = {
+                    start: new DayPilot.Date("2025-03-25T00:00:00").addDays(start),
+                    end: new DayPilot.Date("2025-03-25T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),
+                    text: "Event"
+                };
+                events.push(event);
+            }
+            dp.update({events});
+        }
+    };
+    app.init();
+</script>
+
+</body>
+</html>
