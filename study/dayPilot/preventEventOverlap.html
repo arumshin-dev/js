@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Overlapping (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #dp {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Event Overlapping (JavaScript Scheduler)</h1>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            {groupBy: "Month", format: "MMMM yyyy"},
+            {groupBy: "Cell", format: "d"}
+        ],
+        allowEventOverlap: false,  // 중복 이벤트 허용 안함!
+        treeEnabled: true,
+        resources: [
+            {name: "Room A", id: "A"},
+            {name: "Room B", id: "B"},
+            {name: "Room C", id: "C"},
+            {name: "Room D", id: "D"},
+            {name: "Room E", id: "E"},
+            {name: "Room F", id: "F"},
+            {name: "Room G", id: "G"},
+            {name: "Room H", id: "H"},
+            {name: "Room I", id: "I"},
+            {name: "Room J", id: "J"},
+            {name: "Room K", id: "K"}
+        ],
+        onTimeRangeSelected: args => {
+            const name = prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (!name) return;
+            const e = new DayPilot.Event({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: name
+            });
+            dp.events.add(e);
+            dp.message("Created");
+        },
+        eventDeleteHandling: "Update"
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+            for (let y = 1; y < 5; y++) {
+                const offset = Math.floor(Math.random() * 2);
+                let first = new DayPilot.Date("2025-03-25T00:00:00").addDays(offset);
+                for (let i = 0; i < 15; i++) {
+                    const duration = Math.floor(Math.random() * 6) + 1;
+                    const start = Math.floor(Math.random() * 3) + 1;
+                    const e = {
+                        start: first.addDays(start),
+                        end: first.addDays(start).addDays(duration),
+                        id: DayPilot.guid(),
+                        resource: String.fromCharCode(65 + y), // Room B~E
+                        text: "Event"
+                    };
+                    events.push(e);
+                    first = e.end; // 겹치지 않도록 다음 이벤트 시작 위치 조정
+                }
+            }
+            dp.update({events});
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
