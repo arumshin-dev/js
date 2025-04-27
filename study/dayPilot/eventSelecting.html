@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Selecting (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #dp {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Event Selecting (JavaScript Scheduler)</h1>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: new DayPilot.Date("2025-03-25").firstDayOfMonth(),
+        cellGroupBy: "Month",
+        days: new DayPilot.Date("2025-03-25").firstDayOfMonth().daysInMonth(),
+        scale: "Day",
+        eventClickHandling: "Select",  // 이벤트 클릭 시 선택
+        resources: [
+            {name: "Room A", id: "A"},
+            {name: "Room B", id: "B"},
+            {name: "Room C", id: "C"},
+            {name: "Room D", id: "D"},
+            {name: "Room E", id: "E"},
+            {name: "Room F", id: "F"},
+            {name: "Room G", id: "G"},
+            {name: "Room H", id: "H"},
+            {name: "Room I", id: "I"},
+            {name: "Room J", id: "J"}
+        ],
+        onTimeRangeSelected: async (args) => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (!modal.result) return;
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            dp.message("Created");
+        }
+    });
+
+    dp.init();
+    dp.scrollTo(new DayPilot.Date());
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            for (let i = 0; i < 15; i++) {
+                const durationDays = Math.floor(Math.random() * 6 + 2); // 2 ~ 7일
+                const start = Math.floor(Math.random() * 6) + 2; // 2 ~ 7일 오프셋
+
+                const resId = String.fromCharCode(65 + i); // Room A ~ J
+
+                const event = {
+                    start: new DayPilot.Date("2025-03-01T00:00:00").addDays(start),
+                    end: new DayPilot.Date("2025-03-01T00:00:00").addDays(start).addDays(durationDays),
+                    id: DayPilot.guid(),
+                    resource: resId,
+                    text: `Event ${i + 1}`
+                };
+
+                events.push(event);
+            }
+
+            dp.update({events});
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
