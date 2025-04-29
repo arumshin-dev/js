@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Versions (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #dp {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Event Versions (JavaScript Scheduler)</h1>
+
+<label for="position">Position:</label>
+<select id="position">
+    <option value="Above">Above</option>
+    <option value="Below">Below</option>
+</select>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        eventVersionsEnabled: true,
+        eventVersionHeight: 15,
+        eventVersionsReserveSpace: true,
+        eventVersionPosition: "Above",
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            {groupBy: "Month", format: "MMM yyyy"},
+            {groupBy: "Cell", format: "d"}
+        ],
+        treeEnabled: true,
+        resources: [
+            {
+                name: "Locations", id: "G1", expanded: true, children: [
+                    {name: "Room 1", id: "A"},
+                    {name: "Room 2", id: "B"},
+                    {name: "Room 3", id: "C"},
+                    {name: "Room 4", id: "D"}
+                ]
+            },
+            {
+                name: "People", id: "G2", expanded: true, children: [
+                    {name: "Person 1", id: "E"},
+                    {name: "Person 2", id: "F"},
+                    {name: "Person 3", id: "G"},
+                    {name: "Person 4", id: "H"}
+                ]
+            },
+            {
+                name: "Tools", id: "G3", expanded: true, children: [
+                    {name: "Tool 1", id: "I"},
+                    {name: "Tool 2", id: "J"},
+                    {name: "Tool 3", id: "K"},
+                    {name: "Tool 4", id: "L"}
+                ]
+            }
+        ],
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) {
+                return;
+            }
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            dp.message("Created");
+        },
+        height: 300
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        init() {
+            this.addEventHandlers();
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            for (let i = 0; i < 4; i++) {  // 샘플 이벤트 4개만 추가
+                const startOffset = i + 1;
+                const durationDays = 5;
+
+                const e = {
+                    start: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset),
+                    end: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset + durationDays),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i),  // A, B, C, D
+                    text: `Event ${i + 1}`,
+                    versions: [
+                        {
+                            start: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset),
+                            end: new DayPilot.Date("2025-03-25T00:00:00").addDays(startOffset + durationDays + 1),
+                            barHidden: true
+                        }
+                    ]
+                };
+                events.push(e);
+            }
+
+            dp.update({events});
+        },
+        addEventHandlers() {
+            document.querySelector("#position").addEventListener("change", function() {
+                dp.eventVersionPosition = this.value;
+                dp.update();
+            });
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
