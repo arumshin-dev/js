@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>External Drag and Drop (DayPilot Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        #external {
+            width: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #external ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #external li {
+            background: #f4f4f4;
+            margin: 5px 0;
+            padding: 8px;
+            cursor: move;
+            border: 1px solid #ddd;
+        }
+
+        #queue {
+            border: 1px dashed #999;
+            padding: 10px;
+            min-height: 50px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .external-shadow {
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #scheduler {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="external">
+    <strong>Drag items from this list to the scheduler:</strong>
+    <ul>
+        <li data-id="123" data-duration="1">Item #123 (1 hour)</li>
+        <li data-id="124" data-duration="2">Item #124 (2 hours)</li>
+    </ul>
+    <div id="queue">
+        <strong>Drop here to remove from scheduler</strong>
+    </div>
+</div>
+
+<div id="scheduler"></div>
+
+<script>
+    const scheduler = new DayPilot.Scheduler("scheduler", {
+        startDate: new DayPilot.Date("2025-03-01"),
+        days: new DayPilot.Date("2025-03-01").daysInMonth(),
+        scale: "Hour",
+        timeHeaders: [
+            { groupBy: "Day" },
+            { groupBy: "Hour" }
+        ],
+        treeEnabled: true,
+        resources: [
+            { name: "Room A", id: "A" },
+            { name: "Room B", id: "B" },
+            { name: "Room C", id: "C" },
+            { name: "Room D", id: "D" },
+            { name: "Room E", id: "E" },
+            { name: "Room F", id: "F" }
+        ],
+        onEventMoving: args => {
+            args.right.enabled = true;
+            args.right.html = "external: " + args.external;
+        },
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            scheduler.clearSelection();
+            if (modal.canceled) return;
+            scheduler.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+            scheduler.message("Created");
+        },
+        dragOutAllowed: true
+    });
+    scheduler.init();
+
+    const app = {
+        init() {
+            this.makeDraggable();
+            this.registerDropTarget();
+        },
+        makeDraggable() {
+            const parent = document.getElementById("external");
+            const items = parent.getElementsByTagName("li");
+
+            for (let i = 0; i < items.length; i++) {
+                const e = items[i];
+                const item = {
+                    element: e,
+                    remove: e,
+                    id: e.getAttribute("data-id"),
+                    text: e.innerText,
+                    duration: DayPilot.Duration.hours(e.getAttribute("data-duration")),
+                    barColor: "red",
+                    barBackColor: "white",
+                    externalCssClass: "external-shadow",
+                    externalHtml: e.innerText,
+                    onDragStart: args => args.options.element.style.opacity = "0.5",
+                    onDrop: args => args.options.element.style.opacity = ""
+                };
+                DayPilot.Scheduler.makeDraggable(item);
+            }
+        },
+        registerDropTarget() {
+            DayPilot.Scheduler.registerDropTarget({
+                element: document.getElementById("queue"),
+                onDrop: args => {
+                    const parent = document.getElementById("external").querySelector("ul");
+                    const li = document.createElement("li");
+                    li.setAttribute("data-duration", args.e.duration().totalHours());
+                    li.setAttribute("data-id", args.e.id());
+                    li.textContent = args.e.text();
+                    parent.appendChild(li);
+
+                    app.makeDraggable();
+                    scheduler.events.remove(args.e);
+                }
+            });
+        }
+    };
+    app.init();
+</script>
+
+</body>
+</html>
