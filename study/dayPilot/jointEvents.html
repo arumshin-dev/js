@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Joint Events (DayPilot Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .toolbar {
+            margin-bottom: 10px;
+        }
+
+        .toolbar label {
+            margin-right: 20px;
+        }
+
+        #dp {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Joint Events (JavaScript Scheduler)</h1>
+
+<div class="toolbar">
+    <label>
+        <input type="checkbox" id="move-together" checked>
+        Move joint events together
+    </label>
+    <label>
+        <input type="checkbox" id="resize-together" checked>
+        Resize joint events together
+    </label>
+</div>
+
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            {groupBy: "Month", format: "MMMM yyyy"},
+            {groupBy: "Cell", format: "d"}
+        ],
+        treeEnabled: true,
+        resources: [
+            {name: "Room A", id: "A"},
+            {name: "Room B", id: "B"},
+            {name: "Room C", id: "C"},
+            {name: "Room D", id: "D"},
+            {name: "Room E", id: "E"},
+            {name: "Room F", id: "F"},
+            {name: "Room G", id: "G"},
+            {name: "Room H", id: "H"},
+            {name: "Room I", id: "I"},
+            {name: "Room J", id: "J"},
+            {name: "Room K", id: "K"}
+        ],
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+
+            dp.message("Created");
+        },
+        jointEventsMove: true,
+        jointEventsResize: true,
+        height: 300
+    });
+    dp.init();
+    dp.scrollTo("2025-03-25");
+
+    const app = {
+        init() {
+            this.loadEventData();
+            this.addEventHandlers();
+        },
+        loadEventData() {
+            const events = [];
+            const jointGroupId = "group1";
+
+            for (let i = 0; i < 6; i++) {
+                const e = {
+                    id: DayPilot.guid(),
+                    start: "2025-03-31",
+                    end: "2025-04-04",
+                    resource: String.fromCharCode(65 + i),
+                    text: "Event",
+                    join: jointGroupId
+                };
+                events.push(e);
+            }
+
+            dp.update({events});
+        },
+        addEventHandlers() {
+            document.getElementById("move-together").addEventListener("change", function () {
+                dp.jointEventsMove = this.checked;
+            });
+
+            document.getElementById("resize-together").addEventListener("change", function () {
+                dp.jointEventsResize = this.checked;
+            });
+        }
+    };
+    app.init();
+</script>
+
+</body>
+</html>
