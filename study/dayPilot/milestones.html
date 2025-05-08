@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Milestones (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #dp {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Milestones (JavaScript Scheduler)</h1>
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        startDate: "2025-01-01",
+        days: 365,
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMM yyyy" },
+            { groupBy: "Cell", format: "d" }
+        ],
+        treeEnabled: true,
+        treePreventParentUsage: true,
+        resources: [
+            {
+                name: "Locations", id: "G1", expanded: true, children: [
+                    { name: "Room 1", id: "A" },
+                    { name: "Room 2", id: "B" },
+                    { name: "Room 3", id: "C" },
+                    { name: "Room 4", id: "D" }
+                ]
+            }
+        ],
+        heightSpec: "Max",
+        height: 500,
+        eventMovingStartEndEnabled: true,
+        eventResizingStartEndEnabled: true,
+        timeRangeSelectingStartEndEnabled: true,
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "New Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result
+            });
+
+            dp.message("Created");
+        }
+    });
+    dp.init();
+    dp.scrollTo("2025-03-01");
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            // 일반 이벤트 4개 생성
+            for (let i = 0; i < 4; i++) {
+                const duration = Math.floor(Math.random() * 6) + 1;
+                const durationDays = Math.floor(Math.random() * 6) + 1;
+                const start = Math.floor(Math.random() * 6) + 2;
+
+                const event = {
+                    start: new DayPilot.Date("2025-03-05T00:00:00").addDays(start),
+                    end: new DayPilot.Date("2025-03-05T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+                    id: DayPilot.guid(),
+                    resource: String.fromCharCode(65 + i), // A, B, C, D
+                    text: "Event " + (i + 1),
+                    bubbleHtml: "Event " + (i + 1),
+                    barColor: this.barColor(i),
+                    barBackColor: this.barBackColor(i)
+                };
+
+                events.push(event);
+            }
+
+            // 마일스톤 이벤트 추가
+            events.push({
+                start: "2025-03-02T00:00:00",
+                resource: "A",
+                id: DayPilot.guid(),
+                type: "Milestone",
+                htmlRight: "Milestone 1",
+            });
+
+            dp.update({ events });
+        },
+        barColor(i) {
+            const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc0000"];
+            return colors[i % colors.length];
+        },
+        barBackColor(i) {
+            const colors = ["#a4c2f4", "#b6d7a8", "#ffe599", "#ea9999"];
+            return colors[i % colors.length];
+        }
+    };
+    app.init();
+</script>
+
+</body>
+</html>
