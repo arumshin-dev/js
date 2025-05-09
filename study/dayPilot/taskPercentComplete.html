@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Task Percent Complete (JavaScript Scheduler)</title>
+    <script src="daypilot-all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #dp {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Task Percent Complete (JavaScript Scheduler)</h1>
+<div id="dp"></div>
+
+<script>
+    const dp = new DayPilot.Scheduler("dp", {
+        durationBarMode: "PercentComplete",
+        startDate: new DayPilot.Date("2025-03-01"),
+        days: new DayPilot.Date("2025-03-01").daysInMonth(),
+        scale: "Day",
+        timeHeaders: [
+            { groupBy: "Month", format: "MMMM yyyy" },
+            { groupBy: "Day", format: "d" }
+        ],
+        treeEnabled: true,
+        resources: [
+            { name: "Room A", id: "A" },
+            { name: "Room B", id: "B" },
+            { name: "Room C", id: "C" },
+            { name: "Room D", id: "D" },
+            { name: "Room E", id: "E" },
+            { name: "Room F", id: "F" },
+            { name: "Room G", id: "G" },
+            { name: "Room H", id: "H" },
+            { name: "Room I", id: "I" }
+        ],
+        onTimeRangeSelected: async args => {
+            const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+            dp.clearSelection();
+            if (modal.canceled) return;
+
+            dp.events.add({
+                start: args.start,
+                end: args.end,
+                id: DayPilot.guid(),
+                resource: args.resource,
+                text: modal.result,
+                complete: 0
+            });
+            dp.message("Created");
+        }
+    });
+
+    dp.init();
+    dp.scrollTo("2025-03-10");
+
+    const app = {
+        init() {
+            this.loadEventData();
+        },
+        loadEventData() {
+            const events = [];
+
+            for (let i = 0; i < 9; i++) {
+                const duration = Math.floor(Math.random() * 6) + 1;
+                const durationDays = Math.floor(Math.random() * 6 + 2);
+                const start = Math.floor(Math.random() * 6) + 2;
+                const complete = Math.floor(Math.random() * 101);
+
+                const resourceId = String.fromCharCode(65 + i); // A, B, C...
+                const event = {
+                    start: new DayPilot.Date("2025-03-03T00:00:00").addDays(start),
+                    end: new DayPilot.Date("2025-03-03T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+                    id: DayPilot.guid(),
+                    resource: resourceId,
+                    text: complete + "%",
+                    complete: complete
+                };
+
+                events.push(event);
+            }
+
+            dp.update({ events });
+        }
+    };
+
+    app.init();
+</script>
+
+</body>
+</html>
