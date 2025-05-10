@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Queue of Unscheduled Tasks</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+    }
+    #queue {
+      width: 260px;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+    }
+    #dp {
+      flex-grow: 1;
+    }
+    .scheduler_default_event_inner {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 좌측 큐 -->
+<div id="queue"></div>
+
+<!-- 우측 스케줄러 -->
+<div id="dp"></div>
+
+<script>
+  const dp = new DayPilot.Scheduler("dp", {
+    startDate: new DayPilot.Date("2025-03-01"),
+    days: new DayPilot.Date("2025-03-01").daysInMonth(),
+    scale: "Hour",
+    timeHeaders: [
+      {groupBy: "Day"},
+      {groupBy: "Hour"}
+    ],
+    treeEnabled: true,
+    resources: [
+      {name: "Room A", id: "A"},
+      {name: "Room B", id: "B"},
+      {name: "Room C", id: "C"},
+      {name: "Room D", id: "D"},
+      {name: "Room E", id: "E"},
+      {name: "Room F", id: "F"}
+    ],
+    onEventMoving: args => {
+      args.right.enabled = true;
+      args.right.html = "external: " + args.external;
+    },
+    onEventMove: args => {
+      if (args.external) {
+        queue.events.remove(args.e.data.id);
+      }
+    },
+    onTimeRangeSelected: async args => {
+      const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+      dp.clearSelection();
+      if (!modal.canceled) {
+        dp.events.add({
+          start: args.start,
+          end: args.end,
+          id: DayPilot.guid(),
+          resource: args.resource,
+          text: modal.result
+        });
+        dp.message("Created");
+      }
+    },
+    dragOutAllowed: true
+  });
+  dp.init();
+
+  const queue = new DayPilot.Queue("queue", {
+    onEventMove: args => {
+      if (args.external) {
+        dp.events.remove(args.e.data.id);
+      }
+    },
+    contextMenu: new DayPilot.Menu({
+      items: [
+        {text: "Open", onClick: args => DayPilot.Modal.alert(args.source.text())}
+      ]
+    }),
+    onEventClick: args => {
+      DayPilot.Modal.alert(args.e.text());
+    }
+  });
+  queue.init();
+
+  const app = {
+    init() {
+      this.loadEventData();
+    },
+    loadEventData() {
+      const events = [
+        { id: 1, start: "2025-01-01T00:00:00", end: "2025-01-01T04:00:00", text: "Event 1", tags: {myfield: "value"}, bubbleHtml: "Event details"},
+        { id: 2, duration: DayPilot.Duration.ofHours(3), text: "Event 2"},
+        { id: 3, duration: DayPilot.Duration.ofHours(3), text: "Event 3"},
+        { id: 4, duration: DayPilot.Duration.ofHours(3), text: "Event 4"}
+      ];
+      queue.update({events});
+    }
+  };
+  app.init();
+</script>
+
+</body>
+</html>
