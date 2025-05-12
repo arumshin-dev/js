@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Real-Time Drag and Drop Indicators</title>
+  <script src="daypilot-all.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    #msg {
+      padding: 10px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ccc;
+      font-size: 14px;
+    }
+    #dp {
+      height: calc(100vh - 42px);
+    }
+  </style>
+</head>
+<body>
+
+<div id="msg">실시간 메시지 영역</div>
+<div id="dp"></div>
+
+<script>
+  const dp = new DayPilot.Scheduler("dp", {
+    eventMovingStartEndEnabled: true,
+    eventResizingStartEndEnabled: true,
+    timeRangeSelectingStartEndEnabled: true,
+    startDate: "2025-01-01",
+    days: 365,
+    scale: "Day",
+    timeHeaders: [
+      {groupBy: "Month", format: "MMMM yyyy"},
+      {groupBy: "Cell", format: "d"}
+    ],
+    treeEnabled: true,
+    resources: [
+      {name: "Room A", id: "A"},
+      {name: "Room B", id: "B"},
+      {name: "Room C", id: "C"},
+      {name: "Room D", id: "D"},
+      {name: "Room E", id: "E"},
+      {name: "Room F", id: "F"},
+      {name: "Room G", id: "G"},
+      {name: "Room H", id: "H"},
+      {name: "Room I", id: "I"},
+      {name: "Room J", id: "J"},
+      {name: "Room K", id: "K"}
+    ],
+    onEventMoved: args => {
+      const message = `Moved: ${args.e.text()}`;
+      dp.message(message);
+      app.msg(message);
+    },
+    onTimeRangeSelected: async args => {
+      const modal = await DayPilot.Modal.prompt("New event name:", "Event");
+      dp.clearSelection();
+      if (!modal.canceled) {
+        dp.events.add({
+          start: args.start,
+          end: args.end,
+          id: DayPilot.guid(),
+          resource: args.resource,
+          text: modal.result
+        });
+        dp.message("Created");
+      }
+    },
+    onEventMoving: args => {
+      app.msg(`Dragging: ${args.e.text()} → ${args.start} ~ ${args.end}, Resource: ${args.resource}, Shift: ${args.shift}`);
+    },
+    onTimeRangeSelecting: args => {
+      app.msg(`Selecting: ${args.start} ~ ${args.end}, Resource: ${args.resource}, Mouse: ${args.button}`);
+    },
+    onEventResizing: args => {
+      app.msg(`Resizing: ${args.e.text()} → ${args.start} ~ ${args.end}`);
+    }
+  });
+  dp.init();
+  dp.scrollTo("2025-03-25");
+
+  const app = {
+    init() {
+      this.loadEventData();
+    },
+    msg(text) {
+      document.querySelector("#msg").innerText = text;
+    },
+    loadEventData() {
+      const events = [];
+      for (let i = 0; i < 12; i++) {
+        const duration = Math.floor(Math.random() * 6) + 1;
+        const durationDays = Math.floor(Math.random() * 6 + 2);
+        const start = Math.floor(Math.random() * 6) + 2;
+
+        const resId = String.fromCharCode(65 + i);
+
+        events.push({
+          start: new DayPilot.Date("2025-03-25T00:00:00").addDays(start),
+          end: new DayPilot.Date("2025-03-25T12:00:00").addDays(start).addDays(durationDays).addHours(duration),
+          id: DayPilot.guid(),
+          resource: resId,
+          text: `Event ${i + 1}`
+        });
+      }
+      dp.update({events});
+    }
+  };
+
+  app.init();
+</script>
+
+</body>
+</html>
